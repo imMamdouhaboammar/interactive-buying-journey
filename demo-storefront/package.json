@@ -1,0 +1,19 @@
+{
+  "name": "demo-storefront",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@ibj/sdk": "*"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}
