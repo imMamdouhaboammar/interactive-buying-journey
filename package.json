@@ -1,0 +1,13 @@
+{
+  "name": "interactive-buying-journey-root",
+  "private": true,
+  "workspaces": [
+    "sdk",
+    "demo-storefront"
+  ],
+  "scripts": {
+    "typecheck": "npm run --workspaces typecheck",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  }
+}
