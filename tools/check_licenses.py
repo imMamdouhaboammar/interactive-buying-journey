@@ -19,11 +19,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 ALLOWED_LICENSES = {
     "MIT",
+    "MIT-0",
     "BSD-2-Clause",
     "BSD-3-Clause",
     "Apache-2.0",
     "ISC",
     "0BSD",
+    "CC0-1.0",
     "MPL-2.0",
     "PolyForm-Shield-1.0.0",
 }
