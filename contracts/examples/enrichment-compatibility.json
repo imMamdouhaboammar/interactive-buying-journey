@@ -1,0 +1,28 @@
+{
+  "contract_version": "1.0",
+  "tenant_id": "demo_store",
+  "proposal_id": "enrich_lap_006_dock",
+  "variant_id": "lap_006",
+  "catalog_version": "demo_feed_1",
+  "kind": "compatibility",
+  "attribute_key": null,
+  "related_variant_id": "dock_001",
+  "candidate_value": null,
+  "canonical_unit": null,
+  "source": {
+    "origin": "supplier_document",
+    "source_ref": "synthetic:unverified-accessory-list",
+    "source_version": "demo_v1",
+    "extracted_at": "2026-09-26T12:00:00Z",
+    "extractor_version": "offline_extract_demo_v1",
+    "evidence_excerpt_ref": null
+  },
+  "confidence": null,
+  "status": "needs_evidence",
+  "review": {
+    "decision": "pending",
+    "reviewer_id": null,
+    "reviewed_at": null,
+    "note": "No evidence: unknown compatibility, never publish"
+  }
+}

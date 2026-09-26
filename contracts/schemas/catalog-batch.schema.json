@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CatalogBatch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "batch_id",
+    "tenant_id",
+    "source",
+    "source_version",
+    "upserts",
+    "deletes"
+  ],
+  "properties": {
+    "batch_id": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_version": {
+      "type": "string"
+    },
+    "upserts": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": [
+          "product_id",
+          "variant_id",
+          "sku",
+          "title",
+          "published",
+          "currency",
+          "price_minor",
+          "inventory_status",
+          "source_updated_at"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "variant_id": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 250
+          },
+          "category": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "price_minor": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "inventory_status": {
+            "enum": [
+              "in_stock",
+              "out_of_stock",
+              "preorder",
+              "unknown"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "maxProperties": 100
+          },
+          "source_updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "deletes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 1000
+    }
+  }
+}

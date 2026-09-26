@@ -1,0 +1,29 @@
+{
+  "contract_version": "1.0",
+  "request_id": "req_pilot_0000001",
+  "tenant_id": "demo_store",
+  "session_token": "anonymous_ephemeral_001",
+  "page": {
+    "kind": "collection",
+    "category_id": "laptops"
+  },
+  "locale": "en",
+  "currency": "USD",
+  "consent": {
+    "version": "v1",
+    "purposes": [
+      "necessary"
+    ]
+  },
+  "preferences": {
+    "purpose": "portable work",
+    "max_budget_minor": 130000,
+    "max_weight_grams": 1600
+  },
+  "allowed_slots": [
+    "collection_top",
+    "collection_comparison",
+    "collection_filters"
+  ],
+  "page_events": []
+}

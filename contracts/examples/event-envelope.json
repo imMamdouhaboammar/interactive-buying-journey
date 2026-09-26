@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "event_id": "evt_202609260001",
+  "tenant_id": "demo_store",
+  "topic": "recommendation.exposed.v1",
+  "occurred_at": "2026-09-26T12:00:00Z",
+  "idempotency_key": "exposure_plan_00000001",
+  "consent_scope": [
+    "analytics"
+  ],
+  "payload": {
+    "slot_id": "collection_top",
+    "plan_id": "plan_00000001",
+    "visible_ms": 1200
+  },
+  "source": "storefront_sdk",
+  "plan_id": "plan_00000001"
+}

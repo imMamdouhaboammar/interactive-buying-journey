@@ -1,0 +1,70 @@
+{
+  "contract_version": "1.0",
+  "request_id": "req_pilot_0000001",
+  "plan_id": "plan_00000001",
+  "tenant_id": "demo_store",
+  "status": "adapted",
+  "locale": "en",
+  "catalog_version": "demo_feed_1",
+  "policy_version": "policy_1",
+  "expires_at": "2026-09-26T16:00:00Z",
+  "experiment_arm": null,
+  "sections": [
+    {
+      "section_id": "portable_shortlist",
+      "kind": "product-strip",
+      "slot_id": "collection_top",
+      "priority": 10,
+      "items": [
+        {
+          "variant_id": "lap_001",
+          "offer_id": null,
+          "catalog_version": "demo_feed_1"
+        },
+        {
+          "variant_id": "lap_002",
+          "offer_id": null,
+          "catalog_version": "demo_feed_1"
+        }
+      ],
+      "reason_codes": [
+        "matches_budget",
+        "matches_declared_portability"
+      ],
+      "config": {
+        "label_key": "portable_work_shortlist"
+      }
+    },
+    {
+      "section_id": "laptop_facets",
+      "kind": "facet-panel",
+      "slot_id": "collection_filters",
+      "priority": 20,
+      "items": [],
+      "reason_codes": [
+        "facet_variance"
+      ],
+      "config": {
+        "label_key": "refine_results",
+        "facet_keys": [
+          "weight_kg",
+          "battery_wh",
+          "price_band",
+          "ram_gb"
+        ],
+        "collapsed_facet_keys": [
+          "ram_gb"
+        ],
+        "preserve_applied_facets": true
+      }
+    }
+  ],
+  "provenance": {
+    "strategy": "deterministic",
+    "model_used": null,
+    "plugins": [
+      "ibj.buyer-intent"
+    ],
+    "fallback_reason": null
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExperiencePlan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "plan_id",
+    "tenant_id",
+    "status",
+    "locale",
+    "catalog_version",
+    "policy_version",
+    "expires_at",
+    "sections",
+    "provenance"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "1.0"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "adapted",
+        "baseline",
+        "empty"
+      ]
+    },
+    "locale": {
+      "enum": [
+        "en",
+        "ar"
+      ]
+    },
+    "catalog_version": {
+      "type": "string"
+    },
+    "policy_version": {
+      "type": "string"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "experiment_arm": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sections": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "section_id",
+          "kind",
+          "slot_id",
+          "priority",
+          "items",
+          "reason_codes"
+        ],
+        "properties": {
+          "section_id": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "kind": {
+            "enum": [
+              "intent-picker",
+              "product-strip",
+              "comparison-table",
+              "accessory-strip",
+              "explanation",
+              "empty-state",
+              "facet-panel"
+            ]
+          },
+          "slot_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{1,63}$"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "variant_id"
+              ],
+              "properties": {
+                "variant_id": {
+                  "type": "string"
+                },
+                "offer_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "catalog_version": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "reason_codes": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 8,
+            "items": {
+              "enum": [
+                "matches_budget",
+                "matches_declared_portability",
+                "matches_declared_performance",
+                "compatible_accessory",
+                "data_available",
+                "merchant_editorial",
+                "insufficient_evidence",
+                "facet_variance"
+              ]
+            },
+            "minItems": 1
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "label_key": {
+                "type": "string",
+                "maxLength": 80
+              },
+              "options": {
+                "type": "array",
+                "maxItems": 5,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "label_key"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "label_key": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "attribute_keys": {
+                "type": "array",
+                "maxItems": 12,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "facet_keys": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 12,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+                },
+                "description": "Display order for facets in a facet-panel. Buyer-applied facets are always rendered, active and clearable even when absent here."
+              },
+              "collapsed_facet_keys": {
+                "type": "array",
+                "maxItems": 12,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+                },
+                "description": "Facets shown collapsed. A buyer-applied facet is never collapsed or hidden by the renderer."
+              },
+              "preserve_applied_facets": {
+                "const": true
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "facet-panel"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "config"
+              ],
+              "properties": {
+                "items": {
+                  "maxItems": 0
+                },
+                "config": {
+                  "required": [
+                    "facet_keys",
+                    "preserve_applied_facets"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "model_used",
+        "plugins"
+      ],
+      "properties": {
+        "strategy": {
+          "enum": [
+            "deterministic",
+            "deterministic_plus_semantic",
+            "merchant_baseline"
+          ]
+        },
+        "model_used": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20
+        },
+        "fallback_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

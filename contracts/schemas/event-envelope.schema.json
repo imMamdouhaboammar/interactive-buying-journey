@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EventEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "tenant_id",
+    "topic",
+    "occurred_at",
+    "idempotency_key",
+    "consent_scope",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 8
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "topic": {
+      "type": "string",
+      "pattern": "^[a-z]+\\.[a-z_]+\\.v[0-9]+$"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "consent_scope": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "necessary",
+          "analytics",
+          "personalization",
+          "external_ai"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "payload": {
+      "type": "object",
+      "maxProperties": 20
+    },
+    "source": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    }
+  }
+}

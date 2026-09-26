@@ -1,0 +1,365 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OfflineEnrichmentProposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "tenant_id",
+    "proposal_id",
+    "variant_id",
+    "catalog_version",
+    "kind",
+    "candidate_value",
+    "source",
+    "confidence",
+    "status",
+    "review"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "1.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "variant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "catalog_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "enum": [
+        "attribute",
+        "compatibility"
+      ]
+    },
+    "attribute_key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "related_variant_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "candidate_value": {
+      "type": [
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    },
+    "canonical_unit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin",
+        "source_ref",
+        "source_version",
+        "extracted_at",
+        "extractor_version"
+      ],
+      "properties": {
+        "origin": {
+          "enum": [
+            "merchant_feed",
+            "supplier_document",
+            "approved_reference"
+          ]
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extracted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "extractor_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_excerpt_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "status": {
+      "enum": [
+        "needs_evidence",
+        "pending_review",
+        "approved",
+        "rejected",
+        "invalidated"
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "reviewer_id",
+        "reviewed_at"
+      ],
+      "properties": {
+        "decision": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "reviewer_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "$comment": "status is the canonical publication field and is tied to review.decision: needs_evidence/pending_review require an unreviewed pending decision; approved requires an approved decision by a named reviewer with timestamp and an evidence reference; rejected requires a rejected decision by a named reviewer; invalidated records a prior approval that a conflicting source or product revision withdrew and is never published. kind attribute requires attribute_key; kind compatibility requires related_variant_id.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "needs_evidence",
+              "pending_review"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "review": {
+            "properties": {
+              "decision": {
+                "const": "pending"
+              },
+              "reviewer_id": {
+                "type": "null"
+              },
+              "reviewed_at": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "approved"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "review": {
+            "properties": {
+              "decision": {
+                "const": "approved"
+              },
+              "reviewer_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reviewed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "source": {
+            "required": [
+              "evidence_excerpt_ref"
+            ],
+            "properties": {
+              "evidence_excerpt_ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "rejected"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "review": {
+            "properties": {
+              "decision": {
+                "const": "rejected"
+              },
+              "reviewer_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reviewed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "invalidated"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "review": {
+            "properties": {
+              "decision": {
+                "const": "approved"
+              },
+              "reviewer_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reviewed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "attribute"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "attribute_key"
+        ],
+        "properties": {
+          "attribute_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "related_variant_id": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "compatibility"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "related_variant_id"
+        ],
+        "properties": {
+          "related_variant_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attribute_key": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

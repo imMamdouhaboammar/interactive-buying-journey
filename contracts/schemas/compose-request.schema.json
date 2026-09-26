@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComposeRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "request_id",
+    "tenant_id",
+    "session_token",
+    "page",
+    "locale",
+    "consent",
+    "preferences",
+    "allowed_slots"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "1.0"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "session_token": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "category_id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "home",
+            "collection",
+            "pdp",
+            "cart"
+          ]
+        },
+        "category_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "product_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "locale": {
+      "enum": [
+        "en",
+        "ar"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "purposes"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "purposes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "necessary",
+              "analytics",
+              "personalization",
+              "external_ai"
+            ]
+          }
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "max_budget_minor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "min_battery_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_weight_grams": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "brand_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10
+        }
+      }
+    },
+    "allowed_slots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_-]{1,63}$"
+      }
+    },
+    "page_events": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "enum": [
+          "filter_applied",
+          "comparison_opened",
+          "pdp_opened",
+          "cart_started"
+        ]
+      }
+    }
+  }
+}

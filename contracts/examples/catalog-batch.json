@@ -1,0 +1,27 @@
+{
+  "batch_id": "feed_0000001",
+  "tenant_id": "demo_store",
+  "source": "synthetic_fixture",
+  "source_version": "demo_feed_1",
+  "upserts": [
+    {
+      "product_id": "laptop_family_001",
+      "variant_id": "lap_001",
+      "sku": "DEMO-LAP-001",
+      "title": "Everyday Portable 13",
+      "category": "laptops",
+      "brand": "ExampleCo",
+      "published": true,
+      "currency": "USD",
+      "price_minor": 109900,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1270,
+        "battery_wh": 58,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T10:00:00Z"
+    }
+  ],
+  "deletes": []
+}

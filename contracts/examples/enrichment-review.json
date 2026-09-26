@@ -1,0 +1,9 @@
+{
+  "contract_version": "1.0",
+  "tenant_id": "demo_store",
+  "proposal_id": "enrich_lap_006_battery",
+  "source_version": "demo_v1",
+  "catalog_version": "demo_feed_1",
+  "decision": "approved",
+  "note": "Reviewed synthetic supplier evidence"
+}
