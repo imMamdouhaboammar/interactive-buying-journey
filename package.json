@@ -1,0 +1,15 @@
+{
+  "name": "interactive-buying-journey-root",
+  "version": "0.0.1",
+  "license": "PolyForm-Shield-1.0.0",
+  "private": true,
+  "workspaces": [
+    "sdk",
+    "demo-storefront"
+  ],
+  "scripts": {
+    "typecheck": "npm run --workspaces typecheck",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  }
+}

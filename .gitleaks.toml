@@ -1,0 +1,11 @@
+# Copyright (c) 2026 Mamdouh Aboammar
+# SPDX-License-Identifier: PolyForm-Shield-1.0.0
+
+[allowlist]
+description = "Allowlist for synthetic contract fixtures and examples"
+paths = [
+  '''contracts/examples/compose-request\.json''',
+]
+regexes = [
+  '''anonymous_ephemeral_001''',
+]
