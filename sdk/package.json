@@ -1,6 +1,7 @@
 {
   "name": "@ibj/sdk",
   "version": "0.0.1",
+  "license": "PolyForm-Shield-1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

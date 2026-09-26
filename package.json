@@ -1,5 +1,7 @@
 {
   "name": "interactive-buying-journey-root",
+  "version": "0.0.1",
+  "license": "PolyForm-Shield-1.0.0",
   "private": true,
   "workspaces": [
     "sdk",

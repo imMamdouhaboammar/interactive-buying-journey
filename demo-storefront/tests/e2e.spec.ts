@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: PolyForm-Shield-1.0.0
 
 import { test, expect } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import AxeBuilderPkg from "@axe-core/playwright";
 import http from "node:http";
 import { spawn, type ChildProcess } from "node:child_process";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createStorefrontServer } from "../src/server.js";
+
+const AxeBuilder = ((AxeBuilderPkg as any).default || AxeBuilderPkg) as any;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
