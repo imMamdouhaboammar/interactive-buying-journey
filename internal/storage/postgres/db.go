@@ -66,7 +66,7 @@ func RunMigrations(dsn string) error {
 	if err != nil {
 		return fmt.Errorf("open sql connection for migrations: %w", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	if err := goose.Up(db, "migrations"); err != nil {
 		return fmt.Errorf("run goose up: %w", err)
@@ -86,7 +86,7 @@ func RollbackMigrations(dsn string) error {
 	if err != nil {
 		return fmt.Errorf("open sql connection for rollback: %w", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	if err := goose.Down(db, "migrations"); err != nil {
 		return fmt.Errorf("run goose down: %w", err)

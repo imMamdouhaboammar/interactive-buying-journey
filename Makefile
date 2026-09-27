@@ -26,7 +26,7 @@ golangci-lint:
 	fi
 
 test-go:
-	go test -race -v ./...
+	go test -race -v -p 1 ./...
 
 typecheck:
 	bun run typecheck

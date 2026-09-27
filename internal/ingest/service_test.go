@@ -201,7 +201,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 		// Verify prior active version is intact
 		var currentActive string
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT version_id FROM catalog_versions WHERE status = 'ACTIVE'").Scan(&currentActive)
+			return tx.QueryRow(ctx, "SELECT version_id FROM catalog_versions WHERE tenant_id = $1 AND status = 'ACTIVE'", tenantID).Scan(&currentActive)
 		})
 		if currentActive != activeVer {
 			t.Errorf("active version changed unexpectedly: got %s, want %s", currentActive, activeVer)
@@ -255,7 +255,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 		// Verify existing title was preserved
 		var title string
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT title FROM variants WHERE variant_id = $1", vID).Scan(&title)
+			return tx.QueryRow(ctx, "SELECT title FROM variants WHERE tenant_id = $1 AND variant_id = $2", tenantID, vID).Scan(&title)
 		})
 		if title != "Newer Title" {
 			t.Errorf("expected title 'Newer Title', got %q", title)
@@ -296,7 +296,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 		// Original record retained
 		var title string
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT title FROM variants WHERE variant_id = $1", vID).Scan(&title)
+			return tx.QueryRow(ctx, "SELECT title FROM variants WHERE tenant_id = $1 AND variant_id = $2", tenantID, vID).Scan(&title)
 		})
 		if title != "Original" {
 			t.Errorf("expected original record kept, got %q", title)
@@ -323,7 +323,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 
 		var isTomb bool
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE variant_id = $1", vID).Scan(&isTomb)
+			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE tenant_id = $1 AND variant_id = $2", tenantID, vID).Scan(&isTomb)
 		})
 		if !isTomb {
 			t.Errorf("expected variant to be tombstoned")
@@ -338,7 +338,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 		}
 
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE variant_id = $1", vID).Scan(&isTomb)
+			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE tenant_id = $1 AND variant_id = $2", tenantID, vID).Scan(&isTomb)
 		})
 		if !isTomb {
 			t.Errorf("expected variant to remain tombstoned")
@@ -353,7 +353,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 		}
 
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE variant_id = $1", vID).Scan(&isTomb)
+			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE tenant_id = $1 AND variant_id = $2", tenantID, vID).Scan(&isTomb)
 		})
 		if isTomb {
 			t.Errorf("expected variant to be active (not tombstoned)")
@@ -374,7 +374,7 @@ func TestService_IngestDecisionTable(t *testing.T) {
 
 		var isTomb bool
 		_ = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
-			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE variant_id = $1", unknownID).Scan(&isTomb)
+			return tx.QueryRow(ctx, "SELECT is_tombstoned FROM variants WHERE tenant_id = $1 AND variant_id = $2", tenantID, unknownID).Scan(&isTomb)
 		})
 		if !isTomb {
 			t.Errorf("expected stub tombstone in projection")

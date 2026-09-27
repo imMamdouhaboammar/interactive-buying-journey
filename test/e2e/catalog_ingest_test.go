@@ -161,7 +161,7 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to call compose: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("expected 200 OK from compose, got %d", resp.StatusCode)
@@ -234,7 +234,7 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to call compose after v2: %v", err)
 	}
-	defer respV2.Body.Close()
+	defer func() { _ = respV2.Body.Close() }()
 
 	var plan2 contracts.ExperiencePlan
 	if err := json.NewDecoder(respV2.Body).Decode(&plan2); err != nil {
@@ -320,7 +320,7 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to call compose tenant A: %v", err)
 	}
-	defer respAAfterB.Body.Close()
+	defer func() { _ = respAAfterB.Body.Close() }()
 
 	var planAAfterB contracts.ExperiencePlan
 	_ = json.NewDecoder(respAAfterB.Body).Decode(&planAAfterB)
@@ -360,7 +360,7 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to call compose tenant B: %v", err)
 	}
-	defer respB.Body.Close()
+	defer func() { _ = respB.Body.Close() }()
 
 	if respB.StatusCode != http.StatusOK {
 		t.Fatalf("expected 200 OK from tenant B compose, got %d", respB.StatusCode)
@@ -433,7 +433,7 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to call compose after quarantine: %v", err)
 	}
-	defer respAfterInv.Body.Close()
+	defer func() { _ = respAfterInv.Body.Close() }()
 
 	if respAfterInv.StatusCode != http.StatusOK {
 		t.Fatalf("expected 200 OK after quarantine, got %d", respAfterInv.StatusCode)
