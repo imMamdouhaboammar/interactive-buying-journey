@@ -49,7 +49,14 @@ failure-lessons/
 ├── concurrent-ddl-and-test-isolation.md   # DDL deadlocks, schema migrations, and parallel package runs
 ├── temporal-invariants-and-clock-skew.md  # Clock drift, replay windows, and fixture epoch anchoring
 ├── runtime-metrics-and-memory-accounting.md # Monotonic allocation tracking vs. uint64 underflow
-└── error-handling-and-nil-dereferences.md # Pointer returns on domain errors and quarantine state verification
+├── error-handling-and-nil-dereferences.md # Pointer returns on domain errors and quarantine state verification
+├── fail-open-resilience.md                # Fallback invariants, error boundaries, and non-blocking degradation
+├── typescript-runtime-interop.md          # CJS/ESM interop, Bun vs Node execution, and workspace tooling
+├── dependency-licensing.md                # Zero-attribution licenses, OSS audits, and root module exclusions
+├── secret-scanning-and-fixtures.md        # Gitleaks heuristics, synthetic fixtures, and scoped allowlists
+├── browser-e2e-and-network-failures.md    # Playwright transport logs, native network errors, and console assertions
+├── t02-debt-resolutions.md                # Phase 0 debts: stock filtering, count semantics, and secret isolation
+└── t03-interactive-tracer-learnings.md    # Heading a11y, event bubbling, race conditions, and baseline restoration
 ```
 
 ---
