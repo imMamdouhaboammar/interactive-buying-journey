@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -127,8 +128,31 @@ func (c *PostgresCatalog) Search(ctx context.Context, tenantID string, query Sea
 		cleanQ = cleanQ[:256]
 	}
 
+	var maxStaleness *int
+	err := c.db.WithTenantQuery(ctx, tenantID, func(tx pgx.Tx) error {
+		return tx.QueryRow(ctx, `
+			SELECT max_staleness_seconds
+			FROM tenants
+			WHERE tenant_id = $1
+		`, tenantID).Scan(&maxStaleness)
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			slog.Warn("tenant not found for search", "tenant_id", tenantID)
+			return &SearchResult{Variants: []Variant{}, ReturnedCount: 0}, nil
+		}
+		return nil, fmt.Errorf("lookup tenant staleness: %w", err)
+	}
+
+	if maxStaleness == nil {
+		slog.Warn("tenant has no max_staleness_seconds configured; all variants ineligible", "tenant_id", tenantID)
+		return &SearchResult{Variants: []Variant{}, ReturnedCount: 0}, nil
+	}
+
+	asOf := c.clock.Now()
+
 	var sb strings.Builder
-	args := []any{tenantID}
+	args := []any{tenantID, asOf, *maxStaleness}
 
 	sb.WriteString(`
 		SELECT v.variant_id, v.product_id, v.sku, v.title, v.category, v.brand,
@@ -138,7 +162,7 @@ func (c *PostgresCatalog) Search(ctx context.Context, tenantID string, query Sea
 		  AND v.published = TRUE
 		  AND v.is_tombstoned = FALSE
 		  AND v.inventory_status = 'in_stock'
-		  AND v.last_verified_at >= NOW() - ((SELECT COALESCE(max_staleness_seconds, 86400) FROM tenants WHERE tenant_id = $1) * INTERVAL '1 second')
+		  AND v.last_verified_at >= ($2::timestamptz - ($3 * INTERVAL '1 second'))
 	`)
 
 	if query.Category != "" {
@@ -182,7 +206,7 @@ func (c *PostgresCatalog) Search(ctx context.Context, tenantID string, query Sea
 	sb.WriteString(fmt.Sprintf(" LIMIT $%d", len(args)))
 
 	var variants []Variant
-	err := c.db.WithTenantQuery(ctx, tenantID, func(tx pgx.Tx) error {
+	err = c.db.WithTenantQuery(ctx, tenantID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, sb.String(), args...)
 		if err != nil {
 			return err
