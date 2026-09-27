@@ -246,6 +246,35 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 		}
 	})
 
+	t.Run("TC-DEBT-06: toolchain consistency across CI, AGENTS.md, and ADR-0005", func(t *testing.T) {
+		ciContent, err := os.ReadFile("../../../.github/workflows/ci.yml")
+		if err != nil {
+			t.Fatalf("failed reading ci.yml: %v", err)
+		}
+		if !strings.Contains(string(ciContent), "image: postgres:17-alpine") {
+			t.Errorf("TC-DEBT-06: CI workflow does not pin postgres:17-alpine (expected ADR-0005 standard)")
+		}
+
+		agentsContent, err := os.ReadFile("../../../AGENTS.md")
+		if err != nil {
+			t.Fatalf("failed reading AGENTS.md: %v", err)
+		}
+		if strings.Contains(string(agentsContent), "Redis") {
+			t.Errorf("TC-DEBT-06: AGENTS.md lists unused Redis in target stack")
+		}
+		if !strings.Contains(string(agentsContent), "PostgreSQL 17") {
+			t.Errorf("TC-DEBT-06: AGENTS.md does not specify PostgreSQL 17")
+		}
+
+		adrContent, err := os.ReadFile("../../../docs/decisions/0005-t02-persistence-and-ingest.md")
+		if err != nil {
+			t.Fatalf("failed reading ADR-0005: %v", err)
+		}
+		if !strings.Contains(string(adrContent), "postgres:17-alpine") {
+			t.Errorf("TC-DEBT-06: ADR-0005 does not specify postgres:17-alpine")
+		}
+	})
+
 	t.Run("migration rollback and re-apply works cleanly", func(t *testing.T) {
 		dsn := getTestDSN(t)
 		if err := postgres.RollbackMigrations(dsn); err != nil {
