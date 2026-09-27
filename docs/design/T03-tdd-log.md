@@ -29,11 +29,13 @@ archive_reason: null
 | **0.3** | `TC-DEBT-02/03` | Explicit tenant staleness configuration & injected Clock | `3dc70a8` | `83d8234` | PASS |
 | **0.4** | `TC-DEBT-04` | Drop plaintext secrets from tenants table & add SecretProvider | `be971c6` | `9478fa2` | PASS |
 | **0.5** | `TC-DEBT-06` | Align CI PostgreSQL to 17, remove Redis, verify ADR-0005 | `aeee97d` | `76303f7` | PASS |
-| **1.1** | `TC-PREF-01` | Parse and validate preferences in compose request | Pending | Pending | In Progress |
-| **1.2** | `TC-RANK-01/02` | Exact budget & stock filtering in candidate retrieval | Pending | Pending | Pending |
-| **1.3** | `TC-RANK-03` | Deterministic `rank_v1` scoring and tie-breaking | Pending | Pending | Pending |
-| **1.4** | `TC-RANK-04/05` | Synthesis of `adapted` product strip and `empty` state with reason codes | Pending | Pending | Pending |
-| **2.1** | `TC-SDK-01/02` | SDK chips mounting and reactive update dispatch | Pending | Pending | Pending |
-| **2.2** | `TC-SDK-03` | Focus retention on interactive chips | Pending | Pending | Pending |
-| **2.3** | `TC-SDK-04/05` | Bi-directional RTL/LTR parity and sequence abort | Pending | Pending | Pending |
-| **2.4** | `TC-SDK-06/07` | E2E browser verification, fail-open, and Axe accessibility | Pending | Pending | Pending |
+| **1.0** | `TC-PREF-00` | Merchant intent rules schema migration and RLS isolation | `5be0347` | `b6aa4be` | PASS |
+| **1.1** | `TC-PREF-01/02` | Parse and validate preferences in compose request | `57e47c7` | `be056c6` | PASS |
+| **1.2** | `TC-RANK-01/02` | Exact budget & stock filtering in candidate retrieval | `8424036` | `be056c6` | PASS |
+| **1.3** | `TC-RANK-03` | Deterministic `rank_v1` scoring and tie-breaking | `8424036` | `be056c6` | PASS |
+| **1.4** | `TC-RANK-04/05` | Synthesis of `adapted` product strip and `empty` state with reason codes | `8424036` | `be056c6` | PASS |
+| **2.1** | `TC-SDK-01/02` | SDK chips mounting and reactive update dispatch | `684e75f` | `0943cc2` | PASS |
+| **2.2** | `TC-SDK-03` | Focus retention on interactive chips | `684e75f` | `0943cc2` | PASS |
+| **2.3** | `TC-SDK-04/05` | Bi-directional RTL/LTR parity and sequence abort | `684e75f` | `0943cc2` | PASS |
+| **2.4** | `TC-SDK-06` | Restore baseline slot HTML when plan with empty sections is rendered | `9ba28ae` | `6c28721` | PASS |
+| **2.5** | `TC-E2E-01..06` | E2E browser preference tracer, budget filter, reset, RTL, Axe accessibility | `86adff9` | `6c28721` | PASS |
