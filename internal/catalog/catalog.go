@@ -6,6 +6,7 @@ package catalog
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 )
 
@@ -20,6 +21,8 @@ const (
 // Variant represents a purchasable SKU with physical and functional attributes.
 type Variant struct {
 	ID              string          `json:"id"`
+	ProductID       string          `json:"product_id,omitempty"`
+	SKU             string          `json:"sku,omitempty"`
 	Title           string          `json:"title"`
 	TitleAR         string          `json:"title_ar,omitempty"`
 	Category        string          `json:"category"`
@@ -52,6 +55,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 	demoVariants := map[string]Variant{
 		"lap_001": {
 			ID:              "lap_001",
+			ProductID:       "prod_lap_001",
+			SKU:             "DEMO-LAP-001",
 			Title:           "Light 13 Demo",
 			TitleAR:         "حاسوب محمول خفيف 13 تجريبي",
 			Category:        "laptops",
@@ -64,6 +69,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		},
 		"lap_002": {
 			ID:              "lap_002",
+			ProductID:       "prod_lap_002",
+			SKU:             "DEMO-LAP-002",
 			Title:           "Travel 14 Demo",
 			TitleAR:         "حاسوب محمول للسفر 14 تجريبي",
 			Category:        "laptops",
@@ -76,6 +83,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		},
 		"lap_003": {
 			ID:              "lap_003",
+			ProductID:       "prod_lap_003",
+			SKU:             "DEMO-LAP-003",
 			Title:           "Heavy 17 Demo",
 			TitleAR:         "حاسوب محمول مكتبي 17 تجريبي",
 			Category:        "laptops",
@@ -88,6 +97,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		},
 		"lap_004": {
 			ID:              "lap_004",
+			ProductID:       "prod_lap_004",
+			SKU:             "DEMO-LAP-004",
 			Title:           "Everyday 15 Demo",
 			TitleAR:         "حاسوب محمول للاستخدام اليومي 15 تجريبي",
 			Category:        "laptops",
@@ -100,6 +111,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		},
 		"lap_005": {
 			ID:              "lap_005",
+			ProductID:       "prod_lap_005",
+			SKU:             "DEMO-LAP-005",
 			Title:           "Out of stock Light",
 			TitleAR:         "حاسوب خفيف (نفد من المخزون)",
 			Category:        "laptops",
@@ -112,6 +125,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		},
 		"lap_006": {
 			ID:              "lap_006",
+			ProductID:       "prod_lap_006",
+			SKU:             "DEMO-LAP-006",
 			Title:           "Unknown Weight Demo",
 			TitleAR:         "حاسوب بمواصفات غير محددة تجريبي",
 			Category:        "laptops",
@@ -124,6 +139,8 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		},
 		"lap_007": {
 			ID:              "lap_007",
+			ProductID:       "prod_lap_007",
+			SKU:             "DEMO-LAP-007",
 			Title:           "Ultra Light Arabic 14 Demo",
 			TitleAR:         "حاسوب محمول فائق الخفة 14",
 			Category:        "laptops",
@@ -162,7 +179,7 @@ func (c *InMemoryCatalog) GetVariant(_ context.Context, tenantID, variantID stri
 	return &res, nil
 }
 
-// ListLaptops returns all laptop variants for a given tenant.
+// ListLaptops returns all laptop variants for a given tenant, deterministically ordered by product_id, then variant_id.
 func (c *InMemoryCatalog) ListLaptops(_ context.Context, tenantID string) ([]Variant, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -178,5 +195,11 @@ func (c *InMemoryCatalog) ListLaptops(_ context.Context, tenantID string) ([]Var
 			laptops = append(laptops, v)
 		}
 	}
+	sort.Slice(laptops, func(i, j int) bool {
+		if laptops[i].ProductID != laptops[j].ProductID {
+			return laptops[i].ProductID < laptops[j].ProductID
+		}
+		return laptops[i].ID < laptops[j].ID
+	})
 	return laptops, nil
 }
