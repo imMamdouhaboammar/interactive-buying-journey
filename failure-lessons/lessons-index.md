@@ -67,4 +67,28 @@ archive_reason: null
 | **FL-014** | Event Bubbling Collisions Between Injected UI and Host Storefront | Interactive elements inside dynamic injected containers must call `stopPropagation()` to contain events. | SDK Renderer, Storefront | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
 | **FL-015** | Baseline Slot Mutation vs Clean Restoration | Cache pristine innerHTML on first adaptation; restore exact baseline HTML on reset; leave untouched slots unmutated. | SDK Renderer | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
 | **FL-016** | Network Race Conditions on Rapid User Input | Use `AbortController` in client SDK to automatically cancel in-flight requests when sequential user input occurs. | Storefront SDK (`IBJClient`) | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+| **FL-017** | Rigid Regex Validation Lockout in Tooling Contracts | Preserve rigid validator grammar while adding structured status annotations; decouple doc linting from phrasing templates. | Tooling / Spec Validation | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+| **FL-018** | Distribution Manifest Checksum Drift on Cryptographic Specifications | Cryptographically verified specifications require `--regenerate-manifest` upon every documentation modification. | Tooling / Release Manifest | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+
+---
+
+## 5. Rules We Now Enforce
+
+1. **Fail-Open Presentation, Fail-Closed Commerce:**
+   If the engine fails, times out, or returns empty plans, the merchant storefront must remain untouched. For pricing, inventory, and stock filters, candidate selection must fail-closed (`inventory_status = 'in_stock'`).
+2. **Pristine Baseline Preservation:**
+   Never mutate a merchant slot without snapshotting its pristine initial HTML (`__ibjBaselineHTML`). Resetting or falling back must instantly restore the exact initial baseline without network requests.
+3. **Semantic Heading Hierarchy Invariant:**
+   Slot-injected containers must strictly adhere to `h1 -> h2 -> h3` relative to the host page title. Never render an `<h3>` directly below an `<h1>`.
+4. **Event Propagation Containment:**
+   All interactive event handlers inside injected widgets must call `event.stopPropagation()` to prevent interference with host storefront delegation handlers.
+5. **Sequential Interaction Cancellation:**
+   Client SDKs must manage an active `AbortController` and abort in-flight requests on new user interactions to eliminate network race conditions.
+6. **Explicit Tenant Configuration & Injected Clocks:**
+   Never allow silent defaults on tenant freshness thresholds; inject an explicit temporal `Clock` into queries rather than querying database `NOW()`.
+7. **Secret Isolation via Key References:**
+   Relational database tables must never store plaintext secrets; store opaque key references and resolve via an external `SecretProvider`.
+8. **Contract Reason Code Vocabulary Conformance:**
+   Every section in an `ExperiencePlan` must emit at least one valid enum reason code from the contract schema (`matches_budget`, `matches_declared_portability`, `matches_declared_performance`, `data_available`).
+
 
