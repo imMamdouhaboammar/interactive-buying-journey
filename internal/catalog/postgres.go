@@ -195,8 +195,8 @@ func (c *PostgresCatalog) Search(ctx context.Context, tenantID string, query Sea
 	}
 
 	return &SearchResult{
-		Variants:   variants,
-		TotalCount: len(variants),
+		Variants:      variants,
+		ReturnedCount: len(variants),
 	}, nil
 }
 

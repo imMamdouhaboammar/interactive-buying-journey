@@ -58,11 +58,11 @@ type Facet struct {
 	Count int    `json:"count"`
 }
 
-// SearchResult contains matching variants and total count.
+// SearchResult contains matching variants and returned count.
 type SearchResult struct {
-	Variants   []Variant          `json:"variants"`
-	TotalCount int                `json:"total_count"`
-	Facets     map[string][]Facet `json:"facets,omitempty"`
+	Variants      []Variant          `json:"variants"`
+	ReturnedCount int                `json:"returned_count"`
+	Facets        map[string][]Facet `json:"facets,omitempty"`
 }
 
 // SearchPort defines the contract for catalog search and retrieval.
