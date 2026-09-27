@@ -55,3 +55,50 @@
   fuzz: elapsed: 2s, execs: 481419 (209030/sec), new interesting: 17 (total: 21)
   PASS
   ```
+
+---
+
+## 2. Group 2: Batch Parsing, Attributes & Unicode (TC-TRANS, TC-VAL, TC-UNICODE)
+
+### 2.1 RED Phase
+- **Target:** `internal/ingest/parse.go`, `internal/ingest/parse_test.go`, `internal/ingest/normalize.go`, `internal/ingest/normalize_test.go`
+- **Tests Authored:**
+  - `TestBatchParser_Transport`:
+    - `TC-TRANS-01`: Body exceeds 1MB ceiling rejected (`ErrPayloadTooLarge`)
+    - `TC-TRANS-02`: Empty body payload rejected (`ErrMalformedJSON`)
+    - `TC-TRANS-03`: Non-JSON text body rejected (`ErrMalformedJSON`)
+    - `TC-TRANS-04`: Content-Type `text/plain` rejected (`ErrUnsupportedMediaType`)
+    - Content-Type `application/json; charset=utf-8` accepted
+    - `TC-TRANS-05`: Duplicate keys in JSON payload rejected (`ErrDuplicateJSONKeys`)
+    - `TC-TRANS-06`: Unknown fields rejected by `additionalProperties: false` (`ErrSchemaValidation`)
+  - `TestBatchParser_Validation`:
+    - Valid batch passes parsing
+    - `TC-VAL-01`: Lowercase currency rejected (`ErrSchemaValidation`)
+    - `TC-VAL-02`: Negative price rejected (`ErrSchemaValidation`)
+    - `TC-VAL-03`: Fractional price rejected (`ErrSchemaValidation`)
+    - `TC-VAL-04`: Title > 250 characters rejected (`ErrSchemaValidation`)
+    - `TC-VAL-05`: Empty string `variant_id` rejected (`ErrInvalidAttributeValue`)
+    - `TC-VAL-06`: 1001 upserts rejected (`ErrSchemaValidation`)
+    - `TC-VAL-07`: 1001 deletes rejected (`ErrSchemaValidation`)
+    - `TC-VAL-08`: Wrong attribute type (`weight_g` string) rejected (`ErrInvalidAttributeValue`)
+    - `TC-VAL-09`: Zero weight rejected (`ErrInvalidAttributeValue`)
+    - `TC-VAL-10`: String boolean (`usb_c_pd = "true"`) rejected (`ErrInvalidAttributeValue`)
+    - `TC-VAL-14`: Duplicate variant in upserts rejected (`ErrDuplicateVariant`)
+    - `TC-VAL-14b`: Variant in both upserts and deletes rejected (`ErrDuplicateVariant`)
+    - Future timestamp skew > 300s rejected (`ErrFutureTimestampSkew`)
+  - `TestNormalization_UnicodeAndArabic`:
+    - `TC-UNICODE-01`: Arabic title with diacritics stripped
+    - `TC-UNICODE-01b`: Tatweel stripped
+    - `TC-UNICODE-02`: Arabic title with alef variants unified
+    - `TC-UNICODE-02b`: Ta Marbuta and Alef Maksura unified
+    - `TC-UNICODE-03`: Title in NFD form converted to NFC
+    - `TC-UNICODE-04`: Emoji and bidirectional markers preserved
+    - `TC-UNICODE-05`: SQL metacharacters stored literally
+- **Execution Output:**
+  ```text
+  --- FAIL: TestNormalization_UnicodeAndArabic (0.00s)
+  --- FAIL: TestBatchParser_Transport (0.01s)
+  --- FAIL: TestBatchParser_Validation (0.01s)
+  FAIL	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.649s
+  ```
+- **Causal Failure Verified:** Stub implementation returns `errors.New("not implemented")` and empty strings.
