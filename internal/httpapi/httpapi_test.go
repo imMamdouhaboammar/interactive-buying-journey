@@ -6,17 +6,20 @@ package httpapi_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/compose"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/contracts"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/httpapi"
+	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/policy"
 )
 
@@ -187,6 +190,70 @@ func TestComposeEndpoint(t *testing.T) {
 		}
 		if plan.Status != "baseline" {
 			t.Errorf("expected status 'baseline', got %q", plan.Status)
+		}
+	})
+}
+
+func TestCatalogBatchesEndpoint(t *testing.T) {
+	handler, _ := setupTestServer(t)
+
+	tenantID := "demo_store"
+	secret := "test_secret_123"
+	fixedNow := time.Date(2026, 9, 27, 10, 0, 0, 0, time.UTC)
+	tsStr := fmt.Sprintf("%d", fixedNow.Unix())
+	body := []byte(fmt.Sprintf(`{"batch_id":"b1","tenant_id":"%s","source":"manual","source_version":"v1","upserts":[],"deletes":[]}`, tenantID))
+	sig := ingest.SignPayload(secret, fixedNow.Unix(), body)
+
+	t.Run("TC-AUTH-01: missing X-IBJ-Tenant header returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for missing tenant header, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-02: missing X-IBJ-Timestamp header returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for missing timestamp header, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-03: missing X-IBJ-Signature header returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for missing signature header, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-TRANS-04: non-json content-type returns 415", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "text/plain")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnsupportedMediaType {
+			t.Errorf("expected 415 for text/plain, got %d: %s", rec.Code, rec.Body.String())
 		}
 	})
 }

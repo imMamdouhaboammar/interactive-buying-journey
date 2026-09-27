@@ -239,3 +239,26 @@
   PASS
   ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog	0.758s
   ```
+
+---
+
+## 6. Group 6: API Endpoint & System Integration (POST /catalog/batches, TC-COMP-01 .. TC-COMP-03)
+
+### 6.1 RED Phase
+- **Target:** `internal/httpapi/handler.go`, `internal/httpapi/httpapi_test.go`
+- **Tests Authored:**
+  - `TC-AUTH-01`: missing `X-IBJ-Tenant` header returns 401 `MISSING_AUTH_HEADERS`
+  - `TC-AUTH-02`: missing `X-IBJ-Timestamp` header returns 401 `MISSING_AUTH_HEADERS`
+  - `TC-AUTH-03`: missing `X-IBJ-Signature` header returns 401 `MISSING_AUTH_HEADERS`
+  - `TC-TRANS-04`: non-json Content-Type returns 415 `UNSUPPORTED_MEDIA_TYPE`
+- **Execution Output:**
+  ```text
+  --- FAIL: TestCatalogBatchesEndpoint (0.01s)
+      --- FAIL: TestCatalogBatchesEndpoint/TC-AUTH-01:_missing_X-IBJ-Tenant_header_returns_401 (0.00s)
+      --- FAIL: TestCatalogBatchesEndpoint/TC-AUTH-02:_missing_X-IBJ-Timestamp_header_returns_401 (0.00s)
+      --- FAIL: TestCatalogBatchesEndpoint/TC-AUTH-03:_missing_X-IBJ-Signature_header_returns_401 (0.00s)
+      --- FAIL: TestCatalogBatchesEndpoint/TC-TRANS-04:_non-json_content-type_returns_415 (0.00s)
+  FAIL	github.com/imMamdouhaboammar/interactive-buying-journey/internal/httpapi	0.721s
+  ```
+- **Causal Failure Verified:** HTTP 404 (endpoint not mounted).
+
