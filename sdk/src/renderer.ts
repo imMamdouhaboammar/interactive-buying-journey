@@ -14,15 +14,29 @@ export function renderExperiencePlan(
   rootDoc: Document = document,
   callbacks?: RenderCallbacks,
 ): void {
-  // If plan is baseline or has no sections, leave DOM completely untouched
-  if (plan.status === "baseline" || plan.sections.length === 0) {
-    return;
-  }
-
   // Focus preservation: capture focused element attributes before re-rendering
   const activeIntent = rootDoc.activeElement?.getAttribute("data-ibj-intent");
   const activeAction = rootDoc.activeElement?.getAttribute("data-ibj-action");
   const activeBudget = rootDoc.activeElement?.getAttribute("data-ibj-budget");
+
+  // If plan is baseline or has no sections, restore baseline HTML for previously adapted slots
+  if (plan.status === "baseline" || plan.sections.length === 0) {
+    const slots = rootDoc.querySelectorAll<HTMLElement>("[data-ibj-slot], #collection_top");
+    for (const slotEl of Array.from(slots)) {
+      const baseline = (slotEl as any).__ibjBaselineHTML;
+      if (baseline !== undefined) {
+        slotEl.innerHTML = baseline;
+        if (activeIntent) {
+          slotEl.querySelector<HTMLElement>(`[data-ibj-intent="${activeIntent}"]`)?.focus();
+        } else if (activeAction) {
+          slotEl.querySelector<HTMLElement>(`[data-ibj-action="${activeAction}"]`)?.focus();
+        } else if (activeBudget) {
+          slotEl.querySelector<HTMLElement>(`[data-ibj-budget="${activeBudget}"]`)?.focus();
+        }
+      }
+    }
+    return;
+  }
 
   // Group sections by target slot_id
   const slotSections = new Map<string, PlanSection[]>();
@@ -34,11 +48,16 @@ export function renderExperiencePlan(
 
   for (const [slotId, sections] of slotSections.entries()) {
     const slotEl =
-      rootDoc.querySelector(`[data-ibj-slot="${slotId}"]`) ||
+      rootDoc.querySelector<HTMLElement>(`[data-ibj-slot="${slotId}"]`) ||
       rootDoc.getElementById(slotId);
 
     if (!slotEl) {
       continue;
+    }
+
+    // Save baseline HTML if not saved yet
+    if ((slotEl as any).__ibjBaselineHTML === undefined) {
+      (slotEl as any).__ibjBaselineHTML = slotEl.innerHTML;
     }
 
     // Clear previous slot contents
@@ -80,6 +99,36 @@ export function renderExperiencePlan(
   }
 }
 
+function localizeLabelKey(key: string | undefined, locale: Locale): string {
+  const isAr = locale === "ar";
+  switch (key) {
+    case "what_matters_most":
+      return isAr ? "ما الذي يهمك أكثر؟" : "What matters most?";
+    case "recommended_laptops":
+      return isAr ? "الحواسيب المقترحة" : "Recommended for You";
+    case "no_matching_laptops":
+      return isAr ? "لم يتم العثور على حواسيب مطابقة" : "No matching laptops found";
+    default:
+      return key || (isAr ? "ما الذي يهمك أكثر؟" : "What matters most?");
+  }
+}
+
+function localizeIntentOption(id: string, labelKey: string | undefined, locale: Locale): string {
+  const isAr = locale === "ar";
+  switch (id) {
+    case "portable_work":
+      return isAr ? "عمل متنقل" : "Portable Work";
+    case "performance":
+      return isAr ? "أداء عالي" : "Performance";
+    case "everyday_value":
+      return isAr ? "استخدام يومي اقتصادي" : "Everyday Value";
+    case "not_sure":
+      return isAr ? "لست متأكداً" : "Not Sure";
+    default:
+      return labelKey || id;
+  }
+}
+
 function renderIntentPicker(
   section: PlanSection,
   locale: Locale,
@@ -95,12 +144,10 @@ function renderIntentPicker(
   // Header / Title
   const header = rootDoc.createElement("div");
   header.className = "ibj-intent-header";
-  const title = rootDoc.createElement("h3");
+  const title = rootDoc.createElement("h2");
   title.className = "ibj-intent-title";
-  const labelKey =
-    (section.config?.label_key as string) ||
-    (isAr ? "ما الذي يهمك أكثر؟" : "What matters most?");
-  title.textContent = labelKey;
+  const labelText = localizeLabelKey(section.config?.label_key as string | undefined, locale);
+  title.textContent = labelText;
   header.appendChild(title);
   wrapper.appendChild(header);
 
@@ -108,7 +155,7 @@ function renderIntentPicker(
   const chipList = rootDoc.createElement("div");
   chipList.className = "ibj-chip-list";
   chipList.setAttribute("role", "group");
-  chipList.setAttribute("aria-label", labelKey);
+  chipList.setAttribute("aria-label", labelText);
 
   const rawOptions = (section.config?.options as Array<{ id: string; label_key: string }>) || [];
   const options =
@@ -125,10 +172,14 @@ function renderIntentPicker(
     btn.type = "button";
     btn.className = "ibj-chip";
     btn.setAttribute("data-ibj-intent", opt.id);
-    btn.setAttribute("aria-label", opt.label_key);
-    btn.textContent = opt.label_key;
+    const chipLabel = localizeIntentOption(opt.id, opt.label_key, locale);
+    btn.setAttribute("aria-label", chipLabel);
+    btn.textContent = chipLabel;
     if (callbacks?.onSelectIntent) {
-      btn.addEventListener("click", () => callbacks.onSelectIntent!(opt.id));
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        callbacks.onSelectIntent!(opt.id);
+      });
     }
     chipList.appendChild(btn);
   }
@@ -143,6 +194,7 @@ function renderIntentPicker(
   budgetGroup.appendChild(budgetTitle);
 
   const budgetTiers = [
+    { label: isAr ? "حتى $500" : "Up to $500", minor: 50000 },
     { label: isAr ? "حتى $1,000" : "Up to $1,000", minor: 100000 },
     { label: isAr ? "حتى $1,200" : "Up to $1,200", minor: 120000 },
     { label: isAr ? "حتى $1,500" : "Up to $1,500", minor: 150000 },
@@ -155,7 +207,10 @@ function renderIntentPicker(
     bBtn.setAttribute("aria-label", b.label);
     bBtn.textContent = b.label;
     if (callbacks?.onSelectBudget) {
-      bBtn.addEventListener("click", () => callbacks.onSelectBudget!(b.minor));
+      bBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        callbacks.onSelectBudget!(b.minor);
+      });
     }
     budgetGroup.appendChild(bBtn);
   }
@@ -168,7 +223,10 @@ function renderIntentPicker(
   resetBtn.setAttribute("aria-label", isAr ? "إعادة الضبط" : "Reset preferences");
   resetBtn.textContent = isAr ? "إعادة الضبط" : "Reset";
   if (callbacks?.onResetPreferences) {
-    resetBtn.addEventListener("click", () => callbacks.onResetPreferences!());
+    resetBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      callbacks.onResetPreferences!();
+    });
   }
   budgetGroup.appendChild(resetBtn);
 
@@ -191,7 +249,7 @@ function renderProductStrip(
   const stripHeader = rootDoc.createElement("div");
   stripHeader.className = "ibj-strip-header";
 
-  const stripTitle = rootDoc.createElement("h3");
+  const stripTitle = rootDoc.createElement("h2");
   stripTitle.className = "ibj-strip-title";
   stripTitle.textContent = isAr ? "المقترحات المتطابقة مع اختياراتك" : "Recommended for You";
   stripHeader.appendChild(stripTitle);
@@ -223,7 +281,7 @@ function renderProductStrip(
     const titleText = merchantCard?.querySelector("h2, h3")?.textContent || item.variant_id;
     const priceText = merchantCard?.querySelector(".price")?.textContent || "";
 
-    const cardTitle = rootDoc.createElement("h4");
+    const cardTitle = rootDoc.createElement("h3");
     cardTitle.textContent = titleText;
     card.appendChild(cardTitle);
 
@@ -272,7 +330,10 @@ function renderEmptyState(
   resetBtn.setAttribute("aria-label", isAr ? "مسح التفضيلات وعرض الكل" : "Reset preferences to view all");
   resetBtn.textContent = isAr ? "مسح التفضيلات وعرض الكل" : "Reset preferences to view all";
   if (callbacks?.onResetPreferences) {
-    resetBtn.addEventListener("click", () => callbacks.onResetPreferences!());
+    resetBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      callbacks.onResetPreferences!();
+    });
   }
   emptyContainer.appendChild(resetBtn);
 

@@ -7999,12 +7999,26 @@ function validateExperiencePlan(data) {
 }
 // sdk/src/renderer.ts
 function renderExperiencePlan(plan, rootDoc = document, callbacks) {
-  if (plan.status === "baseline" || plan.sections.length === 0) {
-    return;
-  }
   const activeIntent = rootDoc.activeElement?.getAttribute("data-ibj-intent");
   const activeAction = rootDoc.activeElement?.getAttribute("data-ibj-action");
   const activeBudget = rootDoc.activeElement?.getAttribute("data-ibj-budget");
+  if (plan.status === "baseline" || plan.sections.length === 0) {
+    const slots = rootDoc.querySelectorAll("[data-ibj-slot], #collection_top");
+    for (const slotEl of Array.from(slots)) {
+      const baseline = slotEl.__ibjBaselineHTML;
+      if (baseline !== undefined) {
+        slotEl.innerHTML = baseline;
+        if (activeIntent) {
+          slotEl.querySelector(`[data-ibj-intent="${activeIntent}"]`)?.focus();
+        } else if (activeAction) {
+          slotEl.querySelector(`[data-ibj-action="${activeAction}"]`)?.focus();
+        } else if (activeBudget) {
+          slotEl.querySelector(`[data-ibj-budget="${activeBudget}"]`)?.focus();
+        }
+      }
+    }
+    return;
+  }
   const slotSections = new Map;
   for (const section of plan.sections) {
     const list = slotSections.get(section.slot_id) || [];
@@ -8015,6 +8029,9 @@ function renderExperiencePlan(plan, rootDoc = document, callbacks) {
     const slotEl = rootDoc.querySelector(`[data-ibj-slot="${slotId}"]`) || rootDoc.getElementById(slotId);
     if (!slotEl) {
       continue;
+    }
+    if (slotEl.__ibjBaselineHTML === undefined) {
+      slotEl.__ibjBaselineHTML = slotEl.innerHTML;
     }
     while (slotEl.firstChild) {
       slotEl.removeChild(slotEl.firstChild);
@@ -8048,6 +8065,34 @@ function renderExperiencePlan(plan, rootDoc = document, callbacks) {
     }
   }
 }
+function localizeLabelKey(key, locale) {
+  const isAr = locale === "ar";
+  switch (key) {
+    case "what_matters_most":
+      return isAr ? "ما الذي يهمك أكثر؟" : "What matters most?";
+    case "recommended_laptops":
+      return isAr ? "الحواسيب المقترحة" : "Recommended for You";
+    case "no_matching_laptops":
+      return isAr ? "لم يتم العثور على حواسيب مطابقة" : "No matching laptops found";
+    default:
+      return key || (isAr ? "ما الذي يهمك أكثر؟" : "What matters most?");
+  }
+}
+function localizeIntentOption(id, labelKey, locale) {
+  const isAr = locale === "ar";
+  switch (id) {
+    case "portable_work":
+      return isAr ? "عمل متنقل" : "Portable Work";
+    case "performance":
+      return isAr ? "أداء عالي" : "Performance";
+    case "everyday_value":
+      return isAr ? "استخدام يومي اقتصادي" : "Everyday Value";
+    case "not_sure":
+      return isAr ? "لست متأكداً" : "Not Sure";
+    default:
+      return labelKey || id;
+  }
+}
 function renderIntentPicker(section, locale, rootDoc, callbacks) {
   const isAr = locale === "ar";
   const wrapper = rootDoc.createElement("div");
@@ -8056,16 +8101,16 @@ function renderIntentPicker(section, locale, rootDoc, callbacks) {
   wrapper.setAttribute("aria-label", isAr ? "اختيار تفضيلات الحاسوب" : "Laptop Preferences");
   const header = rootDoc.createElement("div");
   header.className = "ibj-intent-header";
-  const title = rootDoc.createElement("h3");
+  const title = rootDoc.createElement("h2");
   title.className = "ibj-intent-title";
-  const labelKey = section.config?.label_key || (isAr ? "ما الذي يهمك أكثر؟" : "What matters most?");
-  title.textContent = labelKey;
+  const labelText = localizeLabelKey(section.config?.label_key, locale);
+  title.textContent = labelText;
   header.appendChild(title);
   wrapper.appendChild(header);
   const chipList = rootDoc.createElement("div");
   chipList.className = "ibj-chip-list";
   chipList.setAttribute("role", "group");
-  chipList.setAttribute("aria-label", labelKey);
+  chipList.setAttribute("aria-label", labelText);
   const rawOptions = section.config?.options || [];
   const options = rawOptions.length > 0 ? rawOptions : [
     { id: "portable_work", label_key: isAr ? "عمل متنقل" : "Portable Work" },
@@ -8077,10 +8122,14 @@ function renderIntentPicker(section, locale, rootDoc, callbacks) {
     btn.type = "button";
     btn.className = "ibj-chip";
     btn.setAttribute("data-ibj-intent", opt.id);
-    btn.setAttribute("aria-label", opt.label_key);
-    btn.textContent = opt.label_key;
+    const chipLabel = localizeIntentOption(opt.id, opt.label_key, locale);
+    btn.setAttribute("aria-label", chipLabel);
+    btn.textContent = chipLabel;
     if (callbacks?.onSelectIntent) {
-      btn.addEventListener("click", () => callbacks.onSelectIntent(opt.id));
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        callbacks.onSelectIntent(opt.id);
+      });
     }
     chipList.appendChild(btn);
   }
@@ -8092,6 +8141,7 @@ function renderIntentPicker(section, locale, rootDoc, callbacks) {
   budgetTitle.textContent = isAr ? "الميزانية:" : "Budget:";
   budgetGroup.appendChild(budgetTitle);
   const budgetTiers = [
+    { label: isAr ? "حتى $500" : "Up to $500", minor: 50000 },
     { label: isAr ? "حتى $1,000" : "Up to $1,000", minor: 1e5 },
     { label: isAr ? "حتى $1,200" : "Up to $1,200", minor: 120000 },
     { label: isAr ? "حتى $1,500" : "Up to $1,500", minor: 150000 }
@@ -8104,7 +8154,10 @@ function renderIntentPicker(section, locale, rootDoc, callbacks) {
     bBtn.setAttribute("aria-label", b.label);
     bBtn.textContent = b.label;
     if (callbacks?.onSelectBudget) {
-      bBtn.addEventListener("click", () => callbacks.onSelectBudget(b.minor));
+      bBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        callbacks.onSelectBudget(b.minor);
+      });
     }
     budgetGroup.appendChild(bBtn);
   }
@@ -8115,7 +8168,10 @@ function renderIntentPicker(section, locale, rootDoc, callbacks) {
   resetBtn.setAttribute("aria-label", isAr ? "إعادة الضبط" : "Reset preferences");
   resetBtn.textContent = isAr ? "إعادة الضبط" : "Reset";
   if (callbacks?.onResetPreferences) {
-    resetBtn.addEventListener("click", () => callbacks.onResetPreferences());
+    resetBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      callbacks.onResetPreferences();
+    });
   }
   budgetGroup.appendChild(resetBtn);
   wrapper.appendChild(budgetGroup);
@@ -8129,7 +8185,7 @@ function renderProductStrip(section, locale, rootDoc) {
   strip.setAttribute("aria-label", isAr ? "الحواسيب المقترحة" : "Recommended Laptops");
   const stripHeader = rootDoc.createElement("div");
   stripHeader.className = "ibj-strip-header";
-  const stripTitle = rootDoc.createElement("h3");
+  const stripTitle = rootDoc.createElement("h2");
   stripTitle.className = "ibj-strip-title";
   stripTitle.textContent = isAr ? "المقترحات المتطابقة مع اختياراتك" : "Recommended for You";
   stripHeader.appendChild(stripTitle);
@@ -8152,7 +8208,7 @@ function renderProductStrip(section, locale, rootDoc) {
     const merchantCard = rootDoc.querySelector(`[data-product-id="${item.variant_id}"], [data-variant-id="${item.variant_id}"]`);
     const titleText = merchantCard?.querySelector("h2, h3")?.textContent || item.variant_id;
     const priceText = merchantCard?.querySelector(".price")?.textContent || "";
-    const cardTitle = rootDoc.createElement("h4");
+    const cardTitle = rootDoc.createElement("h3");
     cardTitle.textContent = titleText;
     card.appendChild(cardTitle);
     if (priceText) {
@@ -8187,7 +8243,10 @@ function renderEmptyState(_section, locale, rootDoc, callbacks) {
   resetBtn.setAttribute("aria-label", isAr ? "مسح التفضيلات وعرض الكل" : "Reset preferences to view all");
   resetBtn.textContent = isAr ? "مسح التفضيلات وعرض الكل" : "Reset preferences to view all";
   if (callbacks?.onResetPreferences) {
-    resetBtn.addEventListener("click", () => callbacks.onResetPreferences());
+    resetBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      callbacks.onResetPreferences();
+    });
   }
   emptyContainer.appendChild(resetBtn);
   return emptyContainer;
