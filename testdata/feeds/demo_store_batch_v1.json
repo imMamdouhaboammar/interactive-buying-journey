@@ -20,7 +20,7 @@
         "battery_wh": 65,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_lap_02",
@@ -38,7 +38,7 @@
         "battery_wh": 50,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_lap_03",
@@ -56,7 +56,7 @@
         "battery_wh": 55,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_lap_04",
@@ -74,7 +74,7 @@
         "battery_wh": 90,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_lap_05",
@@ -92,7 +92,7 @@
         "battery_wh": 80,
         "usb_c_pd": false
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_lap_06",
@@ -110,7 +110,7 @@
         "battery_wh": 88,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_acc_01",
@@ -126,7 +126,7 @@
       "attributes": {
         "watts": 65
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_acc_02",
@@ -142,7 +142,7 @@
       "attributes": {
         "dpi": 4000
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_acc_03",
@@ -158,7 +158,7 @@
       "attributes": {
         "material": "neoprene"
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_mon_01",
@@ -174,7 +174,7 @@
       "attributes": {
         "resolution": "4K"
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_mon_02",
@@ -190,7 +190,7 @@
       "attributes": {
         "aspect_ratio": "21:9"
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_lap_07",
@@ -208,7 +208,7 @@
         "battery_wh": 42,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     }
   ],
   "deletes": []

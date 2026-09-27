@@ -20,7 +20,7 @@
         "battery_wh": 65,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T09:00:00Z"
+      "source_updated_at": "2026-09-26T12:00:00Z"
     },
     {
       "product_id": "prod_lap_03",
@@ -38,7 +38,7 @@
         "battery_wh": 55,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T09:00:00Z"
+      "source_updated_at": "2026-09-26T12:00:00Z"
     },
     {
       "product_id": "prod_lap_04",
@@ -56,7 +56,7 @@
         "battery_wh": 90,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T09:00:00Z"
+      "source_updated_at": "2026-09-26T12:00:00Z"
     },
     {
       "product_id": "prod_lap_08",
@@ -74,7 +74,7 @@
         "battery_wh": 70,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T09:00:00Z"
+      "source_updated_at": "2026-09-26T12:00:00Z"
     },
     {
       "product_id": "prod_acc_04",
@@ -90,7 +90,7 @@
       "attributes": {
         "ports": 7
       },
-      "source_updated_at": "2026-09-27T09:00:00Z"
+      "source_updated_at": "2026-09-26T12:00:00Z"
     }
   ],
   "deletes": [

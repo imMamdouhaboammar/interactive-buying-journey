@@ -20,7 +20,7 @@
         "battery_wh": 60,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     },
     {
       "product_id": "prod_b_lap_02",
@@ -38,7 +38,7 @@
         "battery_wh": 85,
         "usb_c_pd": true
       },
-      "source_updated_at": "2026-09-27T08:00:00Z"
+      "source_updated_at": "2026-09-26T10:00:00Z"
     }
   ],
   "deletes": []
