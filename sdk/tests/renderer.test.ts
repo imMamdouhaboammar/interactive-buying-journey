@@ -165,4 +165,31 @@ describe("SDK Renderer & Interactive Tracer", () => {
     await Promise.allSettled([p1, p2]);
     expect(abortCount).toBeGreaterThanOrEqual(1);
   });
+
+  it("TC-SDK-06: restores baseline slot HTML when plan with empty sections is rendered", () => {
+    document.body.innerHTML = `
+      <div id="collection_top" data-ibj-slot="collection_top">
+        <div class="baseline-discovery-card">Baseline Discovery Card</div>
+      </div>
+    `;
+
+    // 1. Adapt slot
+    renderExperiencePlan(adaptedPlan, document);
+    const strip = document.querySelector(".ibj-product-strip");
+    expect(strip).not.toBeNull();
+
+    // 2. Reset with baseline plan (empty sections)
+    const baselinePlan: ExperiencePlan = {
+      ...adaptedPlan,
+      status: "baseline",
+      sections: [],
+    };
+    renderExperiencePlan(baselinePlan, document);
+
+    // 3. Verify strip is gone and baseline card is restored
+    expect(document.querySelector(".ibj-product-strip")).toBeNull();
+    const baselineCard = document.querySelector(".baseline-discovery-card");
+    expect(baselineCard).not.toBeNull();
+    expect(baselineCard?.textContent).toBe("Baseline Discovery Card");
+  });
 });
