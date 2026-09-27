@@ -6,6 +6,7 @@ package postgres_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -289,23 +290,17 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 			t.Fatalf("TC-PREF-00 violated: expected merchant_intent_rules table to exist, got %d", tableCount)
 		}
 
-		tenantA := "tenant_rules_a"
-		tenantB := "tenant_rules_b"
-
-		_, err = db.Pool().Exec(ctx, `
-			INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
-			VALUES ($1, 'Tenant Rules A', 'ref_a', 86400), ($2, 'Tenant Rules B', 'ref_b', 86400)
-			ON CONFLICT (tenant_id) DO NOTHING
-		`, tenantA, tenantB)
-		if err != nil {
-			t.Fatalf("failed seeding tenants: %v", err)
-		}
-
+		ruleID := fmt.Sprintf("rule_a_%d", time.Now().UnixNano())
 		err = db.WithTenantTx(ctx, tenantA, func(tx pgx.Tx) error {
 			_, err := tx.Exec(ctx, `
 				INSERT INTO merchant_intent_rules (rule_id, tenant_id, category_id, intent_key, label_en, label_ar, max_weight_grams, min_battery_hours)
-				VALUES ('rule_a_portable', $1, 'laptops', 'portable_work', 'Portable Work', 'عمل متنقل', 1500, 8.0)
-			`, tenantA)
+				VALUES ($1, $2, 'laptops', 'portable_work', 'Portable Work', 'عمل متنقل', 1500, 8.0)
+				ON CONFLICT (tenant_id, category_id, intent_key) DO UPDATE SET
+					label_en = EXCLUDED.label_en,
+					label_ar = EXCLUDED.label_ar,
+					max_weight_grams = EXCLUDED.max_weight_grams,
+					min_battery_hours = EXCLUDED.min_battery_hours
+			`, ruleID, tenantA)
 			return err
 		})
 		if err != nil {
@@ -313,6 +308,7 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 		}
 
 		err = db.WithTenantTx(ctx, tenantB, func(tx pgx.Tx) error {
+			_, _ = tx.Exec(ctx, "SET ROLE ibj_test_app")
 			var count int
 			err := tx.QueryRow(ctx, "SELECT count(*) FROM merchant_intent_rules").Scan(&count)
 			if err != nil {
