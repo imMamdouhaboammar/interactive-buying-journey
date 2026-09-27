@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -121,8 +123,23 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 		return c.buildBaselinePlan(req, catalogVersion, &reason), nil
 	}
 
-	// Build baseline plan (in Slice 1, adaptation is baseline-first with no decision model)
-	plan := c.buildBaselinePlan(req, catalogVersion, fallbackReason)
+	// Build plan: if preferences declared and no fallback, build adapted plan; else baseline
+	var plan *contracts.ExperiencePlan
+	if hasPreferences(req.Preferences) && fallbackReason == nil {
+		adapted, err := c.buildAdaptedPlan(ctx, req, catalogVersion)
+		if err != nil {
+			slog.Warn("failed to build adapted plan; falling back to baseline",
+				"tenant_id", req.TenantID,
+				"error", err,
+			)
+			reason := "adaptation_error"
+			plan = c.buildBaselinePlan(req, catalogVersion, &reason)
+		} else {
+			plan = adapted
+		}
+	} else {
+		plan = c.buildBaselinePlan(req, catalogVersion, fallbackReason)
+	}
 
 	// Runtime self-validation: ensure the plan is valid against experience-plan.schema.json
 	data, err := json.Marshal(plan)
@@ -147,6 +164,230 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 	}
 
 	return plan, nil
+}
+
+func hasPreferences(prefs contracts.PreferencesContext) bool {
+	return prefs.Purpose != "" || prefs.MaxBudgetMinor != nil || prefs.MinBatteryHours != nil || prefs.MaxWeightGrams != nil || len(prefs.BrandIDs) > 0
+}
+
+func (c *Composer) buildAdaptedPlan(ctx context.Context, req *contracts.ComposeRequest, catalogVersion string) (*contracts.ExperiencePlan, error) {
+	slotID := "collection_top"
+	if len(req.AllowedSlots) > 0 {
+		slotID = req.AllowedSlots[0]
+		for _, s := range req.AllowedSlots {
+			if s == "collection_top" {
+				slotID = "collection_top"
+				break
+			}
+		}
+	}
+
+	laptops, err := c.catalog.ListLaptops(ctx, req.TenantID)
+	if err != nil {
+		return nil, fmt.Errorf("list laptops: %w", err)
+	}
+
+	var eligible []catalog.Variant
+	for _, v := range laptops {
+		if v.InventoryStatus != catalog.InventoryInStock {
+			continue
+		}
+		if req.Preferences.MaxBudgetMinor != nil && v.PriceMinor > *req.Preferences.MaxBudgetMinor {
+			continue
+		}
+		if req.Preferences.MaxWeightGrams != nil && v.WeightG != nil && *v.WeightG > *req.Preferences.MaxWeightGrams {
+			continue
+		}
+		eligible = append(eligible, v)
+	}
+
+	type scoredCandidate struct {
+		variant catalog.Variant
+		score   float64
+	}
+
+	scored := make([]scoredCandidate, len(eligible))
+	for i, v := range eligible {
+		sExp := 0.5
+		switch req.Preferences.Purpose {
+		case "portable_work":
+			if v.WeightG != nil {
+				if *v.WeightG <= 1200 {
+					sExp = 1.0
+				} else if *v.WeightG <= 1500 {
+					sExp = 0.85
+				} else {
+					sExp = 0.3
+				}
+			}
+			if v.BatteryWh != nil && *v.BatteryWh >= 55 {
+				sExp += 0.15
+			}
+		case "performance":
+			if v.BatteryWh != nil && *v.BatteryWh >= 70 {
+				sExp = 0.9
+			} else {
+				sExp = 0.5
+			}
+		case "everyday_value":
+			if v.PriceMinor <= 90000 {
+				sExp = 0.95
+			} else {
+				sExp = 0.5
+			}
+		}
+		if sExp > 1.0 {
+			sExp = 1.0
+		}
+
+		sLex := 0.5
+		cleanTitle := strings.ToLower(v.Title)
+		cleanTitleAR := strings.ToLower(v.TitleAR)
+		if req.Preferences.Purpose == "portable_work" && (strings.Contains(cleanTitle, "light") || strings.Contains(cleanTitle, "travel") || strings.Contains(cleanTitleAR, "خفيف") || strings.Contains(cleanTitleAR, "سفر")) {
+			sLex = 1.0
+		}
+
+		sBus := 0.5
+		qualCount := 0
+		if v.WeightG != nil {
+			qualCount++
+		}
+		if v.BatteryWh != nil {
+			qualCount++
+		}
+		if v.USBCPD != nil {
+			qualCount++
+		}
+		sQual := float64(qualCount) / 3.0
+
+		totalScore := 0.20*sLex + 0.50*sExp + 0.15*sBus + 0.15*sQual
+		scored[i] = scoredCandidate{variant: v, score: totalScore}
+	}
+
+	sort.Slice(scored, func(i, j int) bool {
+		diff := scored[i].score - scored[j].score
+		if diff > 1e-6 {
+			return true
+		} else if diff < -1e-6 {
+			return false
+		}
+		if scored[i].variant.PriceMinor != scored[j].variant.PriceMinor {
+			return scored[i].variant.PriceMinor < scored[j].variant.PriceMinor
+		}
+		return scored[i].variant.ID < scored[j].variant.ID
+	})
+
+	intentPicker := contracts.PlanSection{
+		SectionID:   "intent_picker",
+		Kind:        "intent-picker",
+		SlotID:      slotID,
+		Priority:    10,
+		Items:       []contracts.PlanItem{},
+		ReasonCodes: []string{"data_available"},
+		Config: &contracts.SectionConfig{
+			LabelKey: "what_matters_most",
+			Options: []contracts.ConfigOption{
+				{ID: "portable_work", LabelKey: "intent_portable_work"},
+				{ID: "performance", LabelKey: "intent_performance"},
+				{ID: "everyday_value", LabelKey: "intent_everyday_value"},
+				{ID: "not_sure", LabelKey: "intent_not_sure"},
+			},
+		},
+	}
+
+	if len(scored) == 0 {
+		reasonCodes := []string{"matches_budget"}
+		if req.Preferences.MaxBudgetMinor == nil {
+			reasonCodes = []string{"insufficient_evidence"}
+		}
+
+		emptyState := contracts.PlanSection{
+			SectionID:   "empty_shortlist",
+			Kind:        "empty-state",
+			SlotID:      slotID,
+			Priority:    20,
+			Items:       []contracts.PlanItem{},
+			ReasonCodes: reasonCodes,
+			Config: &contracts.SectionConfig{
+				LabelKey: "no_matching_laptops",
+			},
+		}
+
+		return &contracts.ExperiencePlan{
+			ContractVersion: "1.0",
+			RequestID:       req.RequestID,
+			PlanID:          c.idGen("pl"),
+			TenantID:        req.TenantID,
+			Status:          "empty",
+			Locale:          req.Locale,
+			CatalogVersion:  catalogVersion,
+			PolicyVersion:   "pol_demo_v1",
+			ExpiresAt:       c.clock().UTC().Add(5 * time.Minute).Format(time.RFC3339),
+			Sections:        []contracts.PlanSection{intentPicker, emptyState},
+			Provenance: contracts.PlanProvenance{
+				Strategy:       "deterministic",
+				ModelUsed:      nil,
+				Plugins:        []string{"ibj.preference-ranker"},
+				FallbackReason: nil,
+			},
+		}, nil
+	}
+
+	limit := 4
+	if len(scored) < limit {
+		limit = len(scored)
+	}
+	items := make([]contracts.PlanItem, limit)
+	for i := 0; i < limit; i++ {
+		items[i] = contracts.PlanItem{
+			VariantID:      scored[i].variant.ID,
+			CatalogVersion: catalogVersion,
+		}
+	}
+
+	var reasonCodes []string
+	if req.Preferences.MaxBudgetMinor != nil {
+		reasonCodes = append(reasonCodes, "matches_budget")
+	}
+	if req.Preferences.Purpose == "portable_work" {
+		reasonCodes = append(reasonCodes, "matches_declared_portability")
+	} else if req.Preferences.Purpose == "performance" {
+		reasonCodes = append(reasonCodes, "matches_declared_performance")
+	}
+	if len(reasonCodes) == 0 {
+		reasonCodes = append(reasonCodes, "data_available")
+	}
+
+	productStrip := contracts.PlanSection{
+		SectionID:   "adapted_shortlist",
+		Kind:        "product-strip",
+		SlotID:      slotID,
+		Priority:    20,
+		Items:       items,
+		ReasonCodes: reasonCodes,
+		Config: &contracts.SectionConfig{
+			LabelKey: "recommended_laptops",
+		},
+	}
+
+	return &contracts.ExperiencePlan{
+		ContractVersion: "1.0",
+		RequestID:       req.RequestID,
+		PlanID:          c.idGen("pl"),
+		TenantID:        req.TenantID,
+		Status:          "adapted",
+		Locale:          req.Locale,
+		CatalogVersion:  catalogVersion,
+		PolicyVersion:   "pol_demo_v1",
+		ExpiresAt:       c.clock().UTC().Add(5 * time.Minute).Format(time.RFC3339),
+		Sections:        []contracts.PlanSection{intentPicker, productStrip},
+		Provenance: contracts.PlanProvenance{
+			Strategy:       "deterministic",
+			ModelUsed:      nil,
+			Plugins:        []string{"ibj.preference-ranker"},
+			FallbackReason: nil,
+		},
+	}, nil
 }
 
 func (c *Composer) buildBaselinePlan(req *contracts.ComposeRequest, catalogVersion string, fallbackReason *string) *contracts.ExperiencePlan {

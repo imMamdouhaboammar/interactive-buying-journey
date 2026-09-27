@@ -82,8 +82,39 @@ func TestComposeEndpoint(t *testing.T) {
 		t.Fatalf("failed to read compose-request.json: %v", err)
 	}
 
-	t.Run("valid compose request returns 200 with baseline plan", func(t *testing.T) {
+	t.Run("valid compose request with preferences returns 200 with adapted plan", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/v1/journeys/compose", bytes.NewReader(validPayload))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
+		}
+
+		var plan contracts.ExperiencePlan
+		if err := json.Unmarshal(rec.Body.Bytes(), &plan); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
+
+		if plan.Status != "adapted" {
+			t.Errorf("expected status 'adapted', got %q", plan.Status)
+		}
+		if plan.Provenance.Strategy != "deterministic" {
+			t.Errorf("expected strategy 'deterministic', got %q", plan.Provenance.Strategy)
+		}
+		if len(plan.Sections) != 2 {
+			t.Errorf("expected 2 sections, got %d", len(plan.Sections))
+		}
+	})
+
+	t.Run("valid compose request without preferences returns 200 with baseline plan", func(t *testing.T) {
+		var reqMap map[string]any
+		_ = json.Unmarshal(validPayload, &reqMap)
+		reqMap["preferences"] = map[string]any{}
+		emptyPayload, _ := json.Marshal(reqMap)
+
+		req := httptest.NewRequest(http.MethodPost, "/v1/journeys/compose", bytes.NewReader(emptyPayload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 		handler.ServeHTTP(rec, req)
