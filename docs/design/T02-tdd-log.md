@@ -102,3 +102,25 @@
   FAIL	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.649s
   ```
 - **Causal Failure Verified:** Stub implementation returns `errors.New("not implemented")` and empty strings.
+
+### 2.2 GREEN Phase
+- **Implementation:** `internal/ingest/parse.go`, `internal/ingest/normalize.go`
+  - Added `ValidateTransport`: 1MB ceiling check and Content-Type validation.
+  - Added `CheckDuplicateJSONKeys`: streaming recursive token parsing detecting duplicate keys at any nesting level.
+  - Added `BatchParser.ParseAndValidate`: Draft 2020-12 schema validation via compiled `catalog-batch.schema.json`, blank string checks, duplicate item / cross-list collision checks, future skew check, laptop typed attribute enforcement (`weight_g > 0`, `battery_wh > 0`, `usb_c_pd` boolean).
+  - Added `NormalizeNFC`: Unicode NFC normalization.
+  - Added `NormalizeArabicForSearch`: Tashkeel stripping, Tatweel stripping, and unification of Alef, Ta Marbuta, and Alef Maksura runes.
+- **Execution Output:**
+  ```text
+  PASS
+  ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.711s
+  ```
+
+### 2.3 FUZZ & REFACTOR Phase
+- **Target:** `internal/ingest/parse_fuzz_test.go`
+- Added native fuzz test `FuzzParseBatch` verifying parsing and duplicate key detection against arbitrary payloads.
+- **Execution Output:**
+  ```text
+  fuzz: elapsed: 3s, execs: 72560 (24178/sec), new interesting: 117 (total: 122)
+  PASS
+  ```
