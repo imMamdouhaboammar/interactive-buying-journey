@@ -150,3 +150,28 @@
   ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/storage/postgres	0.637s
   ```
 
+---
+
+## 4. Group 4: Ingest Rules, State Machine & Rapid Property Tests (TC-ORD-01 .. TC-ORD-11, TC-CONC-01)
+
+### 4.1 RED Phase
+- **Target:** `internal/ingest/service.go`, `internal/ingest/service_test.go`
+- **Tests Authored:**
+  - `TC-ORD-01`: same `batch_id`, identical payload hash is idempotent 202 (`IsDuplicate: true`)
+  - `TC-ORD-02`: same `batch_id`, different payload hash returns 409 conflict (`ErrBatchHashMismatch`)
+  - `TC-ORD-03`: single invalid item causes whole batch quarantine (`ErrBatchQuarantined`), prior active version intact
+  - `TC-ORD-04`: upsert older than stored `source_updated_at` skipped as stale (`StatsStale = 1`), existing title kept
+  - `TC-ORD-05`: upsert with equal timestamp and identical content is no-op
+  - `TC-ORD-06`: upsert with equal timestamp and conflicting content keeps original and records conflict (`StatsConflicts = 1`)
+  - `TC-ORD-07`: delete marks variant `is_tombstoned = true`
+  - `TC-ORD-08`: upsert older than tombstone stays tombstoned (`StatsStale = 1`)
+  - `TC-ORD-09`: upsert newer than tombstone resurrects variant (`is_tombstoned = false`)
+  - `TC-ORD-11`: delete of unknown variant records stub tombstone
+  - `TC-CONC-01`: concurrent batches for same tenant serialized cleanly via transaction advisory locks
+- **Execution Output:**
+  ```text
+  --- FAIL: TestService_IngestDecisionTable (0.04s)
+  FAIL	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.741s
+  ```
+- **Causal Failure Verified:** Stub methods return `errors.New("not implemented")`.
+
