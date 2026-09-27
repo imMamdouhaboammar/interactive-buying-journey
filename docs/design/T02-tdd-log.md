@@ -262,3 +262,33 @@
   ```
 - **Causal Failure Verified:** HTTP 404 (endpoint not mounted).
 
+### 6.2 GREEN Phase
+- **Implementation:** `internal/httpapi/handler.go`, `internal/httpapi/compose_postgres_test.go`
+  - Mounted `POST /catalog/batches` route with CORS and headers support (`X-IBJ-Tenant`, `X-IBJ-Timestamp`, `X-IBJ-Signature`).
+  - Added request limit (1MB max), media type verification (requires `application/json`).
+  - Tenant secret lookup and signature verification via `ingest.VerifyHeaders` with rotation and replay window.
+  - Verification of payload tenant against header tenant (`TC-AUTH-12`).
+  - Integrated `ingest.Service` batch submission returning 202 Accepted with batch receipt.
+  - Integrated `PostgresStore` with `compose` handler: dynamic catalog version retrieval with graceful fallback (`catalog_unavailable`) when uninitialized or erroring (`TC-COMP-03`).
+  - Verified `TC-COMP-01` (new active catalog version after ingest) and `TC-COMP-02` (quarantined batch preserves prior active version).
+- **Execution Output:**
+  ```text
+  === RUN   TestCompose_WithPostgresCatalog
+  --- PASS: TestCompose_WithPostgresCatalog (0.11s)
+      --- PASS: TestCompose_WithPostgresCatalog/TC-COMP-03:_compose_before_active_catalog_version_falls_back_gracefully (0.00s)
+      --- PASS: TestCompose_WithPostgresCatalog/TC-COMP-01:_after_batch_ingest,_compose_reflects_new_active_version (0.01s)
+      --- PASS: TestCompose_WithPostgresCatalog/TC-COMP-02:_quarantined_batch_preserves_prior_active_catalog_version (0.01s)
+  === RUN   TestCatalogBatchesEndpoint
+  --- PASS: TestCatalogBatchesEndpoint (0.03s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-AUTH-01:_missing_X-IBJ-Tenant_header_returns_401 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-AUTH-02:_missing_X-IBJ-Timestamp_header_returns_401 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-AUTH-03:_missing_X-IBJ-Signature_header_returns_401 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-TRANS-04:_non-json_content-type_returns_415 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-AUTH-05:_invalid_signature_returns_401 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-AUTH-12:_tenant_mismatch_returns_403 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/TC-TRANS-01:_payload_>_1MB_returns_413 (0.00s)
+      --- PASS: TestCatalogBatchesEndpoint/valid_batch_returns_202_accepted (0.00s)
+  PASS
+  ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/httpapi	2.035s
+  ```
+

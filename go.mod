@@ -7,6 +7,7 @@ require (
 	github.com/pressly/goose/v3 v3.28.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
 	golang.org/x/text v0.42.0
+	pgregory.net/rapid v1.3.0
 )
 
 require (

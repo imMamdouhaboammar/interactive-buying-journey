@@ -199,10 +199,10 @@ func TestCatalogBatchesEndpoint(t *testing.T) {
 
 	tenantID := "demo_store"
 	secret := "test_secret_123"
-	fixedNow := time.Date(2026, 9, 27, 10, 0, 0, 0, time.UTC)
-	tsStr := fmt.Sprintf("%d", fixedNow.Unix())
+	now := time.Now()
+	tsStr := fmt.Sprintf("%d", now.Unix())
 	body := []byte(fmt.Sprintf(`{"batch_id":"b1","tenant_id":"%s","source":"manual","source_version":"v1","upserts":[],"deletes":[]}`, tenantID))
-	sig := ingest.SignPayload(secret, fixedNow.Unix(), body)
+	sig := ingest.SignPayload(secret, now.Unix(), body)
 
 	t.Run("TC-AUTH-01: missing X-IBJ-Tenant header returns 401", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
@@ -254,6 +254,63 @@ func TestCatalogBatchesEndpoint(t *testing.T) {
 
 		if rec.Code != http.StatusUnsupportedMediaType {
 			t.Errorf("expected 415 for text/plain, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-05: invalid signature returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", "v1=0000000000000000000000000000000000000000000000000000000000000000")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for invalid signature, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-12: tenant mismatch returns 403", func(t *testing.T) {
+		mismatchBody := []byte(`{"batch_id":"b1","tenant_id":"different_tenant","source":"manual","source_version":"v1","upserts":[],"deletes":[]}`)
+		mismatchSig := ingest.SignPayload(secret, now.Unix(), mismatchBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(mismatchBody))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", mismatchSig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusForbidden {
+			t.Errorf("expected 403 for tenant mismatch, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-TRANS-01: payload > 1MB returns 413", func(t *testing.T) {
+		hugeBody := make([]byte, (1<<20)+2)
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(hugeBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusRequestEntityTooLarge {
+			t.Errorf("expected 413 for oversized payload, got %d", rec.Code)
+		}
+	})
+
+	t.Run("valid batch returns 202 accepted", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusAccepted {
+			t.Errorf("expected 202 accepted, got %d: %s", rec.Code, rec.Body.String())
 		}
 	})
 }
