@@ -187,6 +187,15 @@ def validate_negative_fixtures() -> bool:
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Validate contracts, schemas, and provenance.")
+    parser.add_argument("--check-provenance", action="store_true", help="Check only cryptographic provenance hashes")
+    args = parser.parse_args()
+
+    if args.check_provenance:
+        success = check_provenance_hashes()
+        sys.exit(0 if success else 1)
+
     success = True
     if not check_provenance_hashes():
         success = False
@@ -205,3 +214,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

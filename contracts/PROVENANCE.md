@@ -1,12 +1,13 @@
 # Contracts Provenance
 
-The JSON Schemas and example payloads in this directory are vendored directly from the private IBJ specification repository under owner decision D-27.
+The JSON Schemas and example payloads in this directory are vendored directly
+from the private IBJ specification repository under owner decision D-27.
 
 ## Upstream Provenance
 
 - **Source Repository:** `imMamdouhaboammar/interactive-buying-journey-spec` (private)
-- **Source Commit:** `6d473fab6f0fe9d8b5a8f121619748256c181827` (`6d473fa`)
-- **Citation:** "IBJ spec (private), commit 6d473fa"
+- **Source Commit:** `f4a734562b95fdf3a54fd8a99f3acddd9f4f8db5`
+- **Sync Timestamp:** `2026-09-27 06:27:38 UTC`
 - **Vendor Policy:** Only `contracts/schemas/*.json` and `contracts/examples/*.json` are mirrored into this repository. No internal spec prose, research notes, private decision registers, or business plans are included.
 
 ## Cryptographic Checksums (SHA-256)
