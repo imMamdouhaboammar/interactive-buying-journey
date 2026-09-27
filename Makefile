@@ -11,6 +11,7 @@ all: check
 build:
 	mkdir -p bin
 	go build -o bin/ibj-api ./cmd/ibj-api
+	go build -o bin/ibj-feed ./cmd/ibj-feed
 	cd sdk && bun run build
 	bun build sdk/src/index.ts --outfile demo-storefront/public/sdk.js --target browser
 

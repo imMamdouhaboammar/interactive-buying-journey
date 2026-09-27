@@ -113,12 +113,11 @@ func (c *PostgresCatalog) Search(ctx context.Context, tenantID string, query Sea
 		SELECT v.variant_id, v.product_id, v.sku, v.title, v.category, v.brand,
 		       v.currency, v.price_minor, v.inventory_status, v.attributes
 		FROM variants v
-		JOIN tenants t ON t.tenant_id = v.tenant_id
 		WHERE v.tenant_id = $1
 		  AND v.published = TRUE
 		  AND v.is_tombstoned = FALSE
 		  AND v.inventory_status IN ('in_stock', 'out_of_stock')
-		  AND v.last_verified_at >= NOW() - (t.max_staleness_seconds * INTERVAL '1 second')
+		  AND v.last_verified_at >= NOW() - ((SELECT COALESCE(max_staleness_seconds, 86400) FROM tenants WHERE tenant_id = $1) * INTERVAL '1 second')
 	`)
 
 	if query.Category != "" {
