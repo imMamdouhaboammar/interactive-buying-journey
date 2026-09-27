@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest"
@@ -22,14 +23,34 @@ var (
 
 const MaxSearchResults = 200
 
-// PostgresCatalog implements CatalogPort and SearchPort backed by PostgreSQL with RLS.
-type PostgresCatalog struct {
-	db *postgres.DB
+// Clock provides injectable time for deterministic catalog operations.
+type Clock interface {
+	Now() time.Time
 }
 
-// NewPostgresCatalog builds a new PostgresCatalog.
+type RealClock struct{}
+
+func (RealClock) Now() time.Time {
+	return time.Now()
+}
+
+// PostgresCatalog implements CatalogPort and SearchPort backed by PostgreSQL with RLS.
+type PostgresCatalog struct {
+	db    *postgres.DB
+	clock Clock
+}
+
+// NewPostgresCatalog builds a new PostgresCatalog with RealClock.
 func NewPostgresCatalog(db *postgres.DB) *PostgresCatalog {
-	return &PostgresCatalog{db: db}
+	return NewPostgresCatalogWithClock(db, RealClock{})
+}
+
+// NewPostgresCatalogWithClock builds a new PostgresCatalog with injected Clock.
+func NewPostgresCatalogWithClock(db *postgres.DB, clock Clock) *PostgresCatalog {
+	if clock == nil {
+		clock = RealClock{}
+	}
+	return &PostgresCatalog{db: db, clock: clock}
 }
 
 // GetActiveVersion retrieves the current ACTIVE catalog version ID.
