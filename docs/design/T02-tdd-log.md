@@ -35,3 +35,23 @@
   FAIL	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.638s
   ```
 - **Causal Failure Verified:** Stub implementation returns `errors.New("not implemented")`.
+
+### 1.2 GREEN Phase
+- **Implementation:** `internal/ingest/auth.go`
+  - Added `SignPayload`: HMAC-SHA256 with `v1=` prefix and hex digest over `${timestamp}.${body}`.
+  - Added `VerifySignature`: strict +/- 300s window check, `v1=` format check, hex validation, constant-time comparison via `subtle.ConstantTimeCompare`, dual-secret verification (current and previous for rotation).
+  - Added `VerifyHeaders`: header extraction, tenant matching between header and payload, timestamp parsing, unknown tenant rejection.
+- **Execution Output:**
+  ```text
+  PASS
+  ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.458s
+  ```
+
+### 1.3 FUZZ & REFACTOR Phase
+- **Target:** `internal/ingest/auth_fuzz_test.go`
+- Added native fuzz test `FuzzVerifySignature` testing arbitrary combinations of secrets, timestamps, bodies, and signatures.
+- **Execution Output:**
+  ```text
+  fuzz: elapsed: 2s, execs: 481419 (209030/sec), new interesting: 17 (total: 21)
+  PASS
+  ```
