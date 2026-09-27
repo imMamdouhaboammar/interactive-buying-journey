@@ -5,6 +5,7 @@ package compose_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog"
@@ -104,4 +105,52 @@ func TestComposer_ComposeJourney_BaselinePlan(t *testing.T) {
 			t.Errorf("expected error for disallowed slot, got nil")
 		}
 	})
+
+	t.Run("catalog_version reflects active projection from catalog port", func(t *testing.T) {
+		cat.SetVersion("demo_store", "cat_v2_updated")
+		defer cat.SetVersion("demo_store", "cat_demo_v1")
+
+		req := sampleRequest()
+		plan, err := composer.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+		if plan.CatalogVersion != "cat_v2_updated" {
+			t.Errorf("expected catalog_version 'cat_v2_updated', got %q", plan.CatalogVersion)
+		}
+	})
+
+	t.Run("catalog store unavailable falls back to schema-valid baseline with fallback reason", func(t *testing.T) {
+		failCat := &failingCatalogPort{}
+		compUnavailable := compose.NewComposer(failCat, pol, val)
+
+		req := sampleRequest()
+		plan, err := compUnavailable.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+		if plan.Status != "baseline" {
+			t.Errorf("expected status 'baseline', got %q", plan.Status)
+		}
+		if plan.CatalogVersion != "unavailable" {
+			t.Errorf("expected catalog_version 'unavailable', got %q", plan.CatalogVersion)
+		}
+		if plan.Provenance.FallbackReason == nil || *plan.Provenance.FallbackReason != "catalog_unavailable" {
+			t.Errorf("expected fallback_reason 'catalog_unavailable', got %v", plan.Provenance.FallbackReason)
+		}
+	})
+}
+
+type failingCatalogPort struct{}
+
+func (f *failingCatalogPort) GetVariant(_ context.Context, _, _ string) (*catalog.Variant, error) {
+	return nil, errors.New("db down")
+}
+
+func (f *failingCatalogPort) ListLaptops(_ context.Context, _ string) ([]catalog.Variant, error) {
+	return nil, errors.New("db down")
+}
+
+func (f *failingCatalogPort) GetActiveVersion(_ context.Context, _ string) (string, error) {
+	return "", errors.New("db down")
 }

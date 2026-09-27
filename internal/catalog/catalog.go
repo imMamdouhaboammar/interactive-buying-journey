@@ -38,12 +38,14 @@ type Variant struct {
 type CatalogPort interface {
 	GetVariant(ctx context.Context, tenantID, variantID string) (*Variant, error)
 	ListLaptops(ctx context.Context, tenantID string) ([]Variant, error)
+	GetActiveVersion(ctx context.Context, tenantID string) (string, error)
 }
 
 // InMemoryCatalog implements CatalogPort using pre-loaded synthetic fixtures.
 type InMemoryCatalog struct {
 	mu       sync.RWMutex
 	catalogs map[string]map[string]Variant
+	versions map[string]string
 }
 
 func intPtr(v int) *int { return &v }
@@ -157,7 +159,29 @@ func NewInMemoryCatalog() *InMemoryCatalog {
 		catalogs: map[string]map[string]Variant{
 			"demo_store": demoVariants,
 		},
+		versions: map[string]string{
+			"demo_store": "cat_demo_v1",
+		},
 	}
+}
+
+// GetActiveVersion returns the active catalog projection version for a tenant.
+func (c *InMemoryCatalog) GetActiveVersion(_ context.Context, tenantID string) (string, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	ver, ok := c.versions[tenantID]
+	if !ok {
+		return "", fmt.Errorf("active catalog version not found for tenant %q", tenantID)
+	}
+	return ver, nil
+}
+
+// SetVersion sets the active catalog projection version for testing.
+func (c *InMemoryCatalog) SetVersion(tenantID, version string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.versions[tenantID] = version
 }
 
 // GetVariant looks up a specific variant within a tenant catalog.
