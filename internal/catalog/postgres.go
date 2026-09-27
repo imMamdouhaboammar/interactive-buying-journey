@@ -116,7 +116,7 @@ func (c *PostgresCatalog) Search(ctx context.Context, tenantID string, query Sea
 		WHERE v.tenant_id = $1
 		  AND v.published = TRUE
 		  AND v.is_tombstoned = FALSE
-		  AND v.inventory_status IN ('in_stock', 'out_of_stock')
+		  AND v.inventory_status = 'in_stock'
 		  AND v.last_verified_at >= NOW() - ((SELECT COALESCE(max_staleness_seconds, 86400) FROM tenants WHERE tenant_id = $1) * INTERVAL '1 second')
 	`)
 
