@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/connector/mock"
+	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/contracts"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest"
 )
 
@@ -23,7 +24,7 @@ func TestGenerateBatch_ValidStructure(t *testing.T) {
 		t.Fatalf("unexpected error generating batch: %v", err)
 	}
 
-	var parsed ingest.RawCatalogBatch
+	var parsed ingest.CatalogBatch
 	if err := json.Unmarshal(payload, &parsed); err != nil {
 		t.Fatalf("failed to unmarshal generated batch: %v", err)
 	}
@@ -39,11 +40,11 @@ func TestGenerateBatch_ValidStructure(t *testing.T) {
 	}
 
 	// Verify schema validation on the generated payload
-	validator, err := ingest.NewSchemaValidator()
+	validator, err := contracts.NewValidator("../../../contracts/schemas")
 	if err != nil {
 		t.Fatalf("failed to create validator: %v", err)
 	}
-	if err := validator.Validate(payload); err != nil {
+	if err := validator.Validate("catalog-batch.schema.json", payload); err != nil {
 		t.Fatalf("generated payload failed schema validation: %v", err)
 	}
 }
@@ -65,7 +66,7 @@ func TestGenerateBatches_MultiBatch10k(t *testing.T) {
 
 	seenIDs := make(map[string]bool)
 	for i, b := range batches {
-		var parsed ingest.RawCatalogBatch
+		var parsed ingest.CatalogBatch
 		if err := json.Unmarshal(b, &parsed); err != nil {
 			t.Fatalf("batch %d failed to unmarshal: %v", i, err)
 		}
@@ -128,12 +129,9 @@ func TestDispatcher_DispatchBatch(t *testing.T) {
 	if tenantHeader != tenantID {
 		t.Errorf("expected tenant header %q, got %q", tenantID, tenantHeader)
 	}
-	var ts int64
-	_, _ = time.Parse(time.RFC3339, tsHeader) // or unix
-	expectedSig := ingest.SignPayload(secret, 0, receivedBody)
-	// We'll verify ingest.VerifyHeaders works on the dispatched request
+
 	err = ingest.VerifyHeaders(tenantHeader, tsHeader, sigHeader, tenantID, secret, "", time.Now(), 300*time.Second, receivedBody)
 	if err != nil {
-		t.Errorf("VerifyHeaders failed on dispatched request: %v (expected sig format: %s)", err, expectedSig)
+		t.Errorf("VerifyHeaders failed on dispatched request: %v", err)
 	}
 }
