@@ -203,3 +203,27 @@
   [rapid] OK, passed 100 tests (716.842584ms)
   PASS
   ```
+
+---
+
+## 5. Group 5: Postgres Catalog & SearchPort (TC-ELIG-01 .. TC-ELIG-04, TC-SEARCH-01 .. TC-SEARCH-08)
+
+### 5.1 RED Phase
+- **Target:** `internal/catalog/postgres.go`, `internal/catalog/postgres_test.go`
+- **Tests Authored:**
+  - `TC-COMP-01`: `GetActiveVersion` returns current active catalog version
+  - `TC-ELIG-01 & 02`: Staleness boundary (`last_verified_at + max_staleness_seconds`) filters out expired variants
+  - `TC-ELIG-04`: Currency mismatch is excluded
+  - `TC-ELIG-03`: Empty eligible set returns honest empty slice (no synthesized fake variants)
+  - `TC-SEARCH-01`: English stemming search matches ("laptop" matches "Laptop")
+  - `TC-SEARCH-02`: Arabic search matches normalized query across diacritics and alef forms
+  - `TC-SEARCH-04`: SQL wildcards treated literally via parameterized query
+  - `TC-SEARCH-05`: Overlong search query is safely bounded
+  - `TC-SEARCH-08`: `ListLaptops` returns deterministic order (`product_id ASC, variant_id ASC`)
+- **Execution Output:**
+  ```text
+  --- FAIL: TestPostgresCatalog_EligibilityAndSearch (0.04s)
+  FAIL	github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog	0.791s
+  ```
+- **Causal Failure Verified:** Stub methods return `errors.New("not implemented")`.
+

@@ -41,6 +41,35 @@ type CatalogPort interface {
 	GetActiveVersion(ctx context.Context, tenantID string) (string, error)
 }
 
+// SearchQuery defines parameters for catalog search and filtering.
+type SearchQuery struct {
+	Query     string   `json:"query"`
+	Category  string   `json:"category"`
+	Currency  string   `json:"currency,omitempty"`
+	Locale    string   `json:"locale,omitempty"`
+	Limit     int      `json:"limit,omitempty"`
+	MaxBudget *int64   `json:"max_budget,omitempty"`
+	BrandIDs  []string `json:"brand_ids,omitempty"`
+}
+
+// Facet represents an aggregated facet bucket.
+type Facet struct {
+	Value string `json:"value"`
+	Count int    `json:"count"`
+}
+
+// SearchResult contains matching variants and total count.
+type SearchResult struct {
+	Variants   []Variant          `json:"variants"`
+	TotalCount int                `json:"total_count"`
+	Facets     map[string][]Facet `json:"facets,omitempty"`
+}
+
+// SearchPort defines the contract for catalog search and retrieval.
+type SearchPort interface {
+	Search(ctx context.Context, tenantID string, query SearchQuery) (*SearchResult, error)
+}
+
 // InMemoryCatalog implements CatalogPort using pre-loaded synthetic fixtures.
 type InMemoryCatalog struct {
 	mu       sync.RWMutex
