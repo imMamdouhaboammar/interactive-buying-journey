@@ -227,3 +227,15 @@
   ```
 - **Causal Failure Verified:** Stub methods return `errors.New("not implemented")`.
 
+### 5.2 GREEN Phase
+- **Implementation:** `internal/catalog/postgres.go`
+  - Added `GetActiveVersion`: retrieves the active catalog version from `catalog_versions`.
+  - Added `GetVariant`: retrieves an active, published, non-tombstoned variant by ID.
+  - Added `ListLaptops`: delegates to `Search` with category `"laptops"` and deterministic sorting.
+  - Added `Search`: implements full-text search with English stemming (`to_tsvector('english', ...)`) and normalized Arabic text search (`to_tsvector('arabic', ...)`), respects tenant `max_staleness_seconds` boundaries, enforces currency matches, budget bounds, brand filters, deterministic tie-breaking (`relevance DESC, product_id ASC, variant_id ASC`), and candidate cap (`LIMIT 200`).
+- **Execution Output:**
+  ```text
+  --- PASS: TestPostgresCatalog_EligibilityAndSearch (0.05s)
+  PASS
+  ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog	0.758s
+  ```
