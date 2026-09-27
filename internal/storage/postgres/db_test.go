@@ -275,6 +275,59 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 		}
 	})
 
+	t.Run("TC-PREF-00: merchant_intent_rules table exists and enforces RLS isolation", func(t *testing.T) {
+		var tableCount int
+		err := db.Pool().QueryRow(ctx, `
+			SELECT count(*)
+			FROM information_schema.tables
+			WHERE table_name = 'merchant_intent_rules'
+		`).Scan(&tableCount)
+		if err != nil {
+			t.Fatalf("query failed: %v", err)
+		}
+		if tableCount != 1 {
+			t.Fatalf("TC-PREF-00 violated: expected merchant_intent_rules table to exist, got %d", tableCount)
+		}
+
+		tenantA := "tenant_rules_a"
+		tenantB := "tenant_rules_b"
+
+		_, err = db.Pool().Exec(ctx, `
+			INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+			VALUES ($1, 'Tenant Rules A', 'ref_a', 86400), ($2, 'Tenant Rules B', 'ref_b', 86400)
+			ON CONFLICT (tenant_id) DO NOTHING
+		`, tenantA, tenantB)
+		if err != nil {
+			t.Fatalf("failed seeding tenants: %v", err)
+		}
+
+		err = db.WithTenantTx(ctx, tenantA, func(tx pgx.Tx) error {
+			_, err := tx.Exec(ctx, `
+				INSERT INTO merchant_intent_rules (rule_id, tenant_id, category_id, intent_key, label_en, label_ar, max_weight_grams, min_battery_hours)
+				VALUES ('rule_a_portable', $1, 'laptops', 'portable_work', 'Portable Work', 'عمل متنقل', 1500, 8.0)
+			`, tenantA)
+			return err
+		})
+		if err != nil {
+			t.Fatalf("failed inserting rule for tenantA: %v", err)
+		}
+
+		err = db.WithTenantTx(ctx, tenantB, func(tx pgx.Tx) error {
+			var count int
+			err := tx.QueryRow(ctx, "SELECT count(*) FROM merchant_intent_rules").Scan(&count)
+			if err != nil {
+				return err
+			}
+			if count != 0 {
+				return errors.New("RLS leak: tenantB saw rules from tenantA")
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("cross-tenant isolation failed: %v", err)
+		}
+	})
+
 	t.Run("migration rollback and re-apply works cleanly", func(t *testing.T) {
 		dsn := getTestDSN(t)
 		if err := postgres.RollbackMigrations(dsn); err != nil {
