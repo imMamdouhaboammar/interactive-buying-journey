@@ -10,6 +10,38 @@ permissions:
   contents: read
 
 jobs:
+  no-private-content:
+    name: No Private Content Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify zero spec-only paths
+        run: |
+          FORBIDDEN_PATHS=("product" "research" "zzzops" "delivery" "experience" "engineering" "evals" "architecture/ADRs" "EXECUTIVE-SUMMARY-AR.md" "DECISION-REGISTER.md")
+          FOUND=0
+          for p in "${FORBIDDEN_PATHS[@]}"; do
+            if [ -e "$p" ]; then
+              echo "::error file=$p::Forbidden spec path exists in public repo: $p"
+              FOUND=1
+            fi
+          done
+          if [ $FOUND -ne 0 ]; then
+            echo "CI FAILED: Spec-only paths detected in public repository."
+            exit 1
+          fi
+
+      - name: Verify zero private frontmatter
+        run: |
+          PRIVATE_FILES=$(grep -r -l --include="*.md" "^visibility:[[:space:]]*private" . || true)
+          if [ -n "$PRIVATE_FILES" ]; then
+            echo "::error::Found files with 'visibility: private':"
+            echo "$PRIVATE_FILES"
+            exit 1
+          fi
+          echo "Verified: Zero private content detected."
+
   hygiene-and-contracts:
     name: Hygiene & Contracts
     runs-on: ubuntu-latest

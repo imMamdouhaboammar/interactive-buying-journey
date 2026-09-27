@@ -1,11 +1,25 @@
+---
+doc_id: IBJ-CODE-0023
+title: Master Lessons Index
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # Master Lessons Index
 
 > **Directory:** `failure-lessons/`  
-> **Last Updated:** September 27, 2026 (Slice 2 = T02 Completion)
+> **Coverage:** Slices 1 & 2 (Baseline & Catalog Ingest)
 
 ---
 
-## 1. Master Index Table
+## 1. Slice 2 Lessons (Catalog Ingest & Storage)
 
 | Lesson | Failure Class | Prevention Rule | System | Status | Document |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -19,21 +33,14 @@
 
 ---
 
-## 2. Rules We Now Enforce
+## 2. Slice 1 Lessons (Baseline & Storefront SDK)
 
-These non-negotiable engineering invariants are enforced across the codebase and CI pipelines:
-
-1. **Defense-in-Depth Tenant Isolation:**
-   - PostgreSQL `FORCE ROW LEVEL SECURITY` is mandatory, but **never** relied upon as the sole barrier. Every application SQL query and test query must explicitly bind `WHERE tenant_id = $1`.
-2. **Scalar InitPlans Over Configuration Joins:**
-   - Never join static tenant configuration tables (`tenants`) in row-scanning search queries. Use scalar subqueries (`SELECT max_staleness_seconds FROM tenants WHERE tenant_id = $1`) so the database optimizer plans it once as an InitPlan.
-3. **Database Test Seriality Under Shared Instances:**
-   - Database integration suites sharing an active PostgreSQL instance must run with `go test -p 1` to prevent DDL migration rollback locks from deadlocking concurrent DML operations.
-4. **Deterministic Past Epochs in Feed Fixtures:**
-   - Test data fixtures must anchor `source_updated_at` timestamps strictly in the past (minimum 24 hours prior) to prevent false-positive future clock skew rejections across international timezones.
-5. **Monotonic Allocation Delta Accounting:**
-   - Benchmarks must measure allocation volume via `runtime.MemStats.TotalAlloc` to eliminate `uint64` underflow caused by runtime GC cycles.
-6. **Zero Nil Dereferences on Domain Error Returns:**
-   - Domain errors returned from transactional boundary services (such as `ErrBatchQuarantined`) guarantee that result pointers are `nil`. Callers must inspect errors first and verify side effects via durable database reads.
-7. **Strict Errcheck Compliance on Defers:**
-   - Every `defer resource.Close()` must explicitly handle or discard error returns using `defer func() { _ = resource.Close() }()`.
+| Lesson | Failure Class | Prevention Rule | System | Status | Document |
+| :--- | :--- | :--- | :---: | :--- | :--- |
+| **FL-001** | Zero-Attribution Permissive Dependency Rejection | Permissive license allowlists must include zero-attribution public-domain variants (`MIT-0`, `0BSD`, `CC0-1.0`). | CI / License Audit | Resolved | [`dependency-licensing.md`](dependency-licensing.md) |
+| **FL-002** | Root Source-Available Package Flagged by OSS Audit | Dependency license checkers must ignore the root repository module when using proprietary or source-available licenses. | CI / Go Toolchain | Resolved | [`dependency-licensing.md`](dependency-licensing.md) |
+| **FL-003** | Secret Scanner False Positive on Contract Examples | Contract fixtures with synthetic auth/token fields must pair with scoped repo allowlists, never disabling scanners globally. | Security / Gitleaks | Resolved | [`secret-scanning-and-fixtures.md`](secret-scanning-and-fixtures.md) |
+| **FL-004** | E2E Console Assertion Tripped by Native Transport Outage | Browser E2E tests for network outages must isolate browser transport logs (`net::ERR_*`) from application-level runtime errors. | E2E Testing / Playwright | Resolved | [`browser-e2e-and-network-failures.md`](browser-e2e-and-network-failures.md) |
+| **FL-005** | Hybrid CJS/ESM Default Export Resolution Failure | TypeScript NodeNext builds targeting multiple runtimes must defensively unwrap default exports (`pkg.default || pkg`). | Storefront SDK / Toolchain | Resolved | [`typescript-runtime-interop.md`](typescript-runtime-interop.md) |
+| **FL-006** | Workspace CLI Flag Ordering Incompatibility | Multi-package workspace scripts must use POSIX subshell execution (`cd <dir> && <cmd>`) rather than trailing directory flags. | Build / Workspace | Resolved | [`typescript-runtime-interop.md`](typescript-runtime-interop.md) |
+| **FL-007** | Storefront Degradation Vulnerability Under Engine Failure | Client SDKs must never mutate, reflow, or blank merchant DOM when engine times out, fails with 5xx, or returns invalid schema. | Storefront SDK / Engine | Resolved | [`fail-open-resilience.md`](fail-open-resilience.md) |

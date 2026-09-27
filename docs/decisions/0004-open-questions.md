@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0013
+title: "ADR-0004: Open Architectural and Operational Questions"
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # ADR-0004: Open Architectural and Operational Questions
 
 - **Status:** PROPOSED (Pending Owner Review)

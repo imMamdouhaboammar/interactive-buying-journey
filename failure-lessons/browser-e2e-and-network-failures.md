@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0017
+title: Browser E2E and Network Failure Testing
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # Browser E2E and Network Failure Testing
 
 This document captures lessons learned when using browser automation (Playwright) to verify resilience, outage behavior, and zero console error guarantees.

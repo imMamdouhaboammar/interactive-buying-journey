@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0004
+title: Security Policy
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # Security Policy
 
 ## Reporting Security Vulnerabilities

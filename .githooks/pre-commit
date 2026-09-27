@@ -1,0 +1,60 @@
+#!/bin/sh
+# Cross-Repo Guard: pre-commit hook (POSIX sh, zero dependencies)
+# Intercepts staged files before they enter local history.
+# Blocks spec-only paths and files with "visibility: private".
+
+set -e
+
+FORBIDDEN_PATHS="product/ research/ zzzops/ delivery/ experience/ engineering/ evals/ architecture/ADRs/ EXECUTIVE-SUMMARY-AR.md DECISION-REGISTER.md"
+VIOLATIONS=""
+
+# Check staged files (Added, Copied, Modified)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+for file in $STAGED_FILES; do
+  # 1. Check forbidden spec paths
+  for fp in $FORBIDDEN_PATHS; do
+    case "$file" in
+      $fp*|$fp)
+        VIOLATIONS="${VIOLATIONS}
+  - Forbidden spec path staged: $file"
+        ;;
+    esac
+  done
+
+  # 2. Check for private visibility in staged Markdown frontmatter
+  case "$file" in
+    *.md|*.markdown)
+      if git show :"$file" 2>/dev/null | grep -q "^visibility:[[:space:]]*private"; then
+        VIOLATIONS="${VIOLATIONS}
+  - File contains 'visibility: private': $file"
+      fi
+      ;;
+  esac
+done
+
+if [ -n "$VIOLATIONS" ]; then
+  printf "\n=======================================================\n" >&2
+  printf "❌ COMMIT REFUSED: Private Spec Content Detected\n" >&2
+  printf "=======================================================\n" >&2
+  printf "This repository (code) is PUBLIC under PolyForm Shield 1.0.0.\n" >&2
+  printf "The following staged file(s) belong to the private specification repository:\n" >&2
+  printf "%s\n\n" "$VIOLATIONS" >&2
+  printf "Remediation:\n" >&2
+  printf "  1. Unstage the offending file(s):\n" >&2
+  printf "       git reset HEAD <file>\n" >&2
+  printf "  2. Keep specifications in the private repository (../spec/)\n" >&2
+  printf "  3. If contracts need to be synchronized, use:\n" >&2
+  printf "       python3 tools/sync_contracts.py --spec ../spec --commit <sha>\n" >&2
+  printf "\nOverride Procedure:\n" >&2
+  printf "  There is no bypass flag in this hook. The only Git mechanism is\n" >&2
+  printf "  '--no-verify', but workspace policy explicitly FORBIDS '--no-verify'.\n" >&2
+  printf "=======================================================\n\n" >&2
+  exit 1
+fi
+
+exit 0
