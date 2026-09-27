@@ -218,6 +218,34 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 		}
 	})
 
+	t.Run("TC-DEBT-04: tenants table stores only key reference and no plaintext secrets", func(t *testing.T) {
+		var secretCols int
+		err := db.Pool().QueryRow(ctx, `
+			SELECT count(*)
+			FROM information_schema.columns
+			WHERE table_name = 'tenants' AND column_name IN ('secret_current', 'secret_previous')
+		`).Scan(&secretCols)
+		if err != nil {
+			t.Fatalf("query failed: %v", err)
+		}
+		if secretCols != 0 {
+			t.Fatalf("TC-DEBT-04 violated: found %d plaintext secret columns in tenants table, expected 0", secretCols)
+		}
+
+		var refCol int
+		err = db.Pool().QueryRow(ctx, `
+			SELECT count(*)
+			FROM information_schema.columns
+			WHERE table_name = 'tenants' AND column_name = 'secret_key_ref'
+		`).Scan(&refCol)
+		if err != nil {
+			t.Fatalf("query failed: %v", err)
+		}
+		if refCol != 1 {
+			t.Fatalf("TC-DEBT-04 violated: expected secret_key_ref column in tenants table, got %d", refCol)
+		}
+	})
+
 	t.Run("migration rollback and re-apply works cleanly", func(t *testing.T) {
 		dsn := getTestDSN(t)
 		if err := postgres.RollbackMigrations(dsn); err != nil {
