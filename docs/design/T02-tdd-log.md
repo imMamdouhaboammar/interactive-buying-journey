@@ -124,3 +124,29 @@
   fuzz: elapsed: 3s, execs: 72560 (24178/sec), new interesting: 117 (total: 122)
   PASS
   ```
+
+---
+
+## 3. Group 3: PostgreSQL Migrations & Multi-Tenant RLS Isolation (TC-ISOL-01 .. TC-ISOL-04)
+
+### 3.1 RED & GREEN Verification
+- **Target:** `internal/storage/postgres/migrations/00001_initial_catalog_schema.sql`, `internal/storage/postgres/db.go`, `internal/storage/postgres/db_test.go`
+- **Tests Authored & Verified:**
+  - `TC-ISOL-01`: queries return only the authenticated tenant rows (verified with non-superuser role `ibj_test_app`).
+  - `TC-ISOL-02`: query without tenant context evaluates `nullif(current_setting('app.current_tenant', true), '')` -> `NULL`, returning strictly 0 rows.
+  - `TC-ISOL-03`: `feed_batches` inserted by `tenantA` cannot be read by `tenantB`.
+  - `TC-ISOL-04`: cross-tenant insert/update rejected by PostgreSQL RLS `WITH CHECK` constraint.
+  - Migration rollback and re-apply verified cleanly via `RollbackMigrations` and `RunMigrations`.
+- **Execution Output:**
+  ```text
+  === RUN   TestPostgres_MigrationsAndRLS
+  === RUN   TestPostgres_MigrationsAndRLS/TC-ISOL-01:_queries_return_only_the_authenticated_tenant_rows
+  === RUN   TestPostgres_MigrationsAndRLS/TC-ISOL-02:_query_without_tenant_context_returns_zero_rows
+  === RUN   TestPostgres_MigrationsAndRLS/TC-ISOL-03:_feed_batches_inserted_by_tenantA_cannot_be_seen_by_tenantB
+  === RUN   TestPostgres_MigrationsAndRLS/TC-ISOL-04:_cross-tenant_insert/update_blocked_by_RLS_WITH_CHECK
+  === RUN   TestPostgres_MigrationsAndRLS/migration_rollback_and_re-apply_works_cleanly
+  --- PASS: TestPostgres_MigrationsAndRLS (0.08s)
+  PASS
+  ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/storage/postgres	0.637s
+  ```
+
