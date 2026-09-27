@@ -159,11 +159,43 @@ func TestPostgresCatalog_EligibilityAndSearch(t *testing.T) {
 				FALSE
 			)
 		`, tenantID)
+		if err != nil {
+			return err
+		}
+
+		// 6. Out-of-stock laptop (violates FR-005 if surfaced)
+		_, err = tx.Exec(ctx, `
+			INSERT INTO variants (
+				tenant_id, variant_id, product_id, sku, title, title_norm, category, brand,
+				published, currency, price_minor, inventory_status, source_updated_at, last_verified_at,
+				is_tombstoned
+			) VALUES (
+				$1, 'lap_outofstock', 'prod_oos', 'SKU-OOS', 'Out of Stock Laptop', 'Out of Stock Laptop', 'laptops', 'BrandA',
+				TRUE, 'USD', 95000, 'out_of_stock', NOW(), NOW(),
+				FALSE
+			)
+		`, tenantID)
 		return err
 	})
 	if err != nil {
 		t.Fatalf("failed seeding variants: %v", err)
 	}
+
+	t.Run("TC-DEBT-01: Out-of-stock variant is excluded from search", func(t *testing.T) {
+		res, err := cat.Search(ctx, tenantID, catalog.SearchQuery{
+			Category: "laptops",
+			Currency: "USD",
+		})
+		if err != nil {
+			t.Fatalf("Search failed: %v", err)
+		}
+
+		for _, v := range res.Variants {
+			if v.ID == "lap_outofstock" || v.InventoryStatus == "out_of_stock" {
+				t.Fatalf("TC-DEBT-01 violated: out-of-stock variant %s was returned in search results!", v.ID)
+			}
+		}
+	})
 
 	t.Run("TC-COMP-01: GetActiveVersion returns active catalog version", func(t *testing.T) {
 		ver, err := cat.GetActiveVersion(ctx, tenantID)
