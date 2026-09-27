@@ -5,6 +5,7 @@ package catalog_test
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog"
@@ -110,3 +111,21 @@ func TestInMemoryCatalog_GetVariant(t *testing.T) {
 		}
 	})
 }
+
+func TestSearchResult_Contract_ReturnedCount(t *testing.T) {
+	res := catalog.SearchResult{
+		Variants: []catalog.Variant{},
+	}
+	data, err := json.Marshal(res)
+	if err != nil {
+		t.Fatalf("marshal error: %v", err)
+	}
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		t.Fatalf("unmarshal error: %v", err)
+	}
+	if _, ok := raw["returned_count"]; !ok {
+		t.Fatalf("SearchResult has misleading total_count reporting page size; expected returned_count, got: %s", string(data))
+	}
+}
+
