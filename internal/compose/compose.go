@@ -78,8 +78,6 @@ func defaultIDGenerator(prefix string) string {
 
 // ComposeJourney synthesizes an experience plan according to the request lifecycle.
 func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeRequest) (*contracts.ExperiencePlan, error) {
-	state := StateBaseline
-
 	// Policy enforcement: Tenant validation
 	if err := c.policy.ValidateTenant(ctx, req.TenantID); err != nil {
 		return nil, fmt.Errorf("tenant policy validation failed: %w", err)
@@ -119,16 +117,9 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 
 	// Kill Switch check
 	if !c.policy.IsAdaptationEnabled() {
-		state = StateBaselineFallback
 		reason := "adaptation_disabled_by_kill_switch"
 		return c.buildBaselinePlan(req, catalogVersion, &reason), nil
 	}
-
-	state = StateContextReady
-	_ = state
-
-	// Candidate retrieval (verifies catalog snapshot presence)
-	state = StateCandidatesReady
 
 	// Build baseline plan (in Slice 1, adaptation is baseline-first with no decision model)
 	plan := c.buildBaselinePlan(req, catalogVersion, fallbackReason)
@@ -155,8 +146,6 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 		return c.buildFallbackBaseline(req, catalogVersion, reason), nil
 	}
 
-	state = StatePlanValidated
-	_ = state
 	return plan, nil
 }
 
