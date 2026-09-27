@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "filesystem": {
+      "allowRead": [
+        "../spec/**"
+      ],
+      "denyWrite": [
+        "../spec/**"
+      ]
+    }
+  }
+}
