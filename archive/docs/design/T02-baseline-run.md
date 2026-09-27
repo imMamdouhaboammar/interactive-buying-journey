@@ -1,3 +1,19 @@
+---
+doc_id: IBJ-CODE-0005
+title: "T02 Baseline Run: Slice 1 Verification"
+lifecycle: transient
+status: archived
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: 2026-09-27
+archive_reason: "Slice T02 completed and PR #3 merged"
+---
+> **ARCHIVED, STALE: kept for the record only. Do not implement from this file. Current source: none.**
+
 # T02 Baseline Run: Slice 1 Verification
 
 - **Commit:** `1e7fe5c` (Branch: `feat/t02-catalog-ingest`)
