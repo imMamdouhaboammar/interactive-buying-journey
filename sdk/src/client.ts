@@ -7,6 +7,7 @@ import { renderExperiencePlan } from "./renderer.js";
 
 export class IBJClient {
   private readonly options: Required<IBJClientOptions>;
+  private activeController: AbortController | null = null;
 
   constructor(options: IBJClientOptions) {
     if (!options.tenantKey) {
@@ -29,7 +30,12 @@ export class IBJClient {
    * it fails open and returns null, never throwing or interrupting the host storefront.
    */
   async compose(params: ComposeParams): Promise<ExperiencePlan | null> {
+    if (this.activeController) {
+      this.activeController.abort();
+    }
     const controller = new AbortController();
+    this.activeController = controller;
+
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, this.options.timeoutMs);
@@ -97,6 +103,9 @@ export class IBJClient {
       return null;
     } finally {
       clearTimeout(timeoutId);
+      if (this.activeController === controller) {
+        this.activeController = null;
+      }
     }
   }
 
@@ -104,13 +113,51 @@ export class IBJClient {
    * Composes and applies the experience plan to the DOM.
    * If compose fails for any reason, leaves DOM completely untouched.
    */
-  async apply(params: ComposeParams, rootDoc?: Document): Promise<ExperiencePlan | null> {
+  async apply(params: ComposeParams, rootDoc: Document = document): Promise<ExperiencePlan | null> {
     const plan = await this.compose(params);
     if (!plan) {
       return null;
     }
 
-    renderExperiencePlan(plan, rootDoc);
+    renderExperiencePlan(plan, rootDoc, {
+      onSelectIntent: (intentId) => {
+        void this.apply(
+          {
+            ...params,
+            requestId: "req_" + Math.random().toString(36).substring(2, 10),
+            preferences: {
+              ...params.preferences,
+              purpose: intentId,
+            },
+          },
+          rootDoc,
+        );
+      },
+      onSelectBudget: (budgetMinor) => {
+        void this.apply(
+          {
+            ...params,
+            requestId: "req_" + Math.random().toString(36).substring(2, 10),
+            preferences: {
+              ...params.preferences,
+              maxBudgetMinor: budgetMinor,
+            },
+          },
+          rootDoc,
+        );
+      },
+      onResetPreferences: () => {
+        void this.apply(
+          {
+            ...params,
+            requestId: "req_" + Math.random().toString(36).substring(2, 10),
+            preferences: {},
+          },
+          rootDoc,
+        );
+      },
+    });
+
     return plan;
   }
 }
