@@ -154,3 +154,198 @@ func (f *failingCatalogPort) ListLaptops(_ context.Context, _ string) ([]catalog
 func (f *failingCatalogPort) GetActiveVersion(_ context.Context, _ string) (string, error) {
 	return "", errors.New("db down")
 }
+
+func TestComposer_PreferenceToUI_Adaptation(t *testing.T) {
+	ctx := context.Background()
+	cat := catalog.NewInMemoryCatalog()
+	pol := policy.NewPolicyChecker([]string{"demo_store"}, []string{"collection_top"})
+	val, err := contracts.NewValidator("../../contracts/schemas")
+	if err != nil {
+		t.Fatalf("failed to create validator: %v", err)
+	}
+
+	composer := compose.NewComposer(cat, pol, val)
+
+	t.Run("TC-RANK-01: budget filter excludes variants exceeding max_budget_minor", func(t *testing.T) {
+		req := sampleRequest()
+		budget := int64(110000) // $1,100
+		req.Preferences = contracts.PreferencesContext{
+			Purpose:        "everyday_value",
+			MaxBudgetMinor: &budget,
+		}
+
+		plan, err := composer.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+
+		if plan.Status != "adapted" {
+			t.Fatalf("expected status 'adapted', got %q", plan.Status)
+		}
+
+		var strip *contracts.PlanSection
+		for _, sec := range plan.Sections {
+			if sec.Kind == "product-strip" {
+				strip = &sec
+				break
+			}
+		}
+		if strip == nil {
+			t.Fatal("expected product-strip section in adapted plan")
+		}
+
+		for _, item := range strip.Items {
+			variant, err := cat.GetVariant(ctx, req.TenantID, item.VariantID)
+			if err != nil {
+				t.Fatalf("failed retrieving variant %s: %v", item.VariantID, err)
+			}
+			if variant.PriceMinor > budget {
+				t.Errorf("variant %s price %d exceeds max budget %d", variant.ID, variant.PriceMinor, budget)
+			}
+		}
+	})
+
+	t.Run("TC-RANK-02: out-of-stock variants excluded even if within budget", func(t *testing.T) {
+		req := sampleRequest()
+		budget := int64(150000)
+		req.Preferences = contracts.PreferencesContext{
+			Purpose:        "portable_work",
+			MaxBudgetMinor: &budget,
+		}
+
+		plan, err := composer.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+
+		var strip *contracts.PlanSection
+		for _, sec := range plan.Sections {
+			if sec.Kind == "product-strip" {
+				strip = &sec
+				break
+			}
+		}
+		if strip == nil {
+			t.Fatal("expected product-strip section in adapted plan")
+		}
+
+		for _, item := range strip.Items {
+			if item.VariantID == "lap_005" {
+				t.Errorf("out-of-stock variant lap_005 surfaced in adapted strip")
+			}
+		}
+	})
+
+	t.Run("TC-RANK-03: rank_v1 deterministic scoring and tie-breaking for portable_work", func(t *testing.T) {
+		req := sampleRequest()
+		req.Preferences = contracts.PreferencesContext{
+			Purpose: "portable_work",
+		}
+
+		plan, err := composer.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+
+		var strip *contracts.PlanSection
+		for _, sec := range plan.Sections {
+			if sec.Kind == "product-strip" {
+				strip = &sec
+				break
+			}
+		}
+		if strip == nil {
+			t.Fatal("expected product-strip section in adapted plan")
+		}
+
+		if len(strip.Items) == 0 {
+			t.Fatal("expected items in portable_work strip")
+		}
+
+		topItem := strip.Items[0].VariantID
+		if topItem != "lap_007" && topItem != "lap_001" {
+			t.Errorf("expected top item for portable_work to be lightweight laptop, got %s", topItem)
+		}
+	})
+
+	t.Run("TC-RANK-04: zero matches emits empty-state section and status empty", func(t *testing.T) {
+		req := sampleRequest()
+		budget := int64(50000) // $500 (below any in-stock laptop)
+		req.Preferences = contracts.PreferencesContext{
+			MaxBudgetMinor: &budget,
+		}
+
+		plan, err := composer.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+
+		if plan.Status != "empty" {
+			t.Fatalf("expected status 'empty', got %q", plan.Status)
+		}
+
+		var emptySec *contracts.PlanSection
+		for _, sec := range plan.Sections {
+			if sec.Kind == "empty-state" {
+				emptySec = &sec
+				break
+			}
+		}
+		if emptySec == nil {
+			t.Fatal("expected empty-state section in empty plan")
+		}
+		foundBudgetReason := false
+		for _, r := range emptySec.ReasonCodes {
+			if r == "matches_budget" || r == "insufficient_evidence" {
+				foundBudgetReason = true
+				break
+			}
+		}
+		if !foundBudgetReason {
+			t.Errorf("expected reason code matches_budget or insufficient_evidence in empty-state, got %v", emptySec.ReasonCodes)
+		}
+	})
+
+	t.Run("TC-RANK-05: valid matches emit product-strip with accurate reason codes", func(t *testing.T) {
+		req := sampleRequest()
+		budget := int64(120000)
+		req.Preferences = contracts.PreferencesContext{
+			Purpose:        "portable_work",
+			MaxBudgetMinor: &budget,
+		}
+
+		plan, err := composer.ComposeJourney(ctx, req)
+		if err != nil {
+			t.Fatalf("unexpected compose error: %v", err)
+		}
+
+		if plan.Status != "adapted" {
+			t.Fatalf("expected status 'adapted', got %q", plan.Status)
+		}
+
+		var strip *contracts.PlanSection
+		for _, sec := range plan.Sections {
+			if sec.Kind == "product-strip" {
+				strip = &sec
+				break
+			}
+		}
+		if strip == nil {
+			t.Fatal("expected product-strip section")
+		}
+
+		hasBudget := false
+		hasPortability := false
+		for _, r := range strip.ReasonCodes {
+			if r == "matches_budget" {
+				hasBudget = true
+			}
+			if r == "matches_declared_portability" {
+				hasPortability = true
+			}
+		}
+		if !hasBudget || !hasPortability {
+			t.Errorf("expected reason codes to include matches_budget and matches_declared_portability, got %v", strip.ReasonCodes)
+		}
+	})
+}
