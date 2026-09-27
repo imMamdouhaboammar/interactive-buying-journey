@@ -1,0 +1,110 @@
+#!/bin/sh
+# Cross-Repo Guard: pre-push hook (POSIX sh, zero dependencies)
+# Refuses push if push URL is not the canonical public repository,
+# or if pushed commits add any spec-only path or private frontmatter.
+
+set -e
+
+REMOTE_NAME="$1"
+REMOTE_URL="$2"
+
+CANONICAL_URL_HTTPS="https://github.com/imMamdouhaboammar/interactive-buying-journey"
+FORBIDDEN_URL_SPEC="https://github.com/imMamdouhaboammar/interactive-buying-journey-spec"
+FORBIDDEN_PATHS="product/ research/ zzzops/ delivery/ experience/ engineering/ evals/ architecture/ADRs/ EXECUTIVE-SUMMARY-AR.md DECISION-REGISTER.md"
+
+# 1. Normalize Remote URL (strip trailing .git, trailing slash, convert git@github.com: to https://github.com/)
+NORM_URL=$(echo "$REMOTE_URL" | sed 's|^git@github\.com:|https://github.com/|; s|\.git$||; s|/$||')
+
+# Check if pushing to the private spec repository
+NORM_FORBIDDEN=$(echo "$FORBIDDEN_URL_SPEC" | sed 's|\.git$||; s|/$||')
+if [ "$NORM_URL" = "$NORM_FORBIDDEN" ]; then
+  printf "\n=======================================================\n" >&2
+  printf "❌ PUSH REFUSED: Push to Private Spec Remote Forbidden\n" >&2
+  printf "=======================================================\n" >&2
+  printf "Attempted push to: %s\n" "$REMOTE_URL" >&2
+  printf "This repository (code) is PUBLIC and must NEVER push to the spec repo.\n" >&2
+  printf "Override Procedure: Forbidden. The workspace bans cross-remote pushes.\n" >&2
+  printf "=======================================================\n\n" >&2
+  exit 1
+fi
+
+# Check canonical public URL
+NORM_EXPECTED=$(echo "$CANONICAL_URL_HTTPS" | sed 's|\.git$||; s|/$||')
+if [ "$NORM_URL" != "$NORM_EXPECTED" ]; then
+  printf "\n=======================================================\n" >&2
+  printf "❌ PUSH REFUSED: Unapproved Remote Destination\n" >&2
+  printf "=======================================================\n" >&2
+  printf "Attempted push to: %s\n" "$REMOTE_URL" >&2
+  printf "Expected canonical public URL: %s\n" "$CANONICAL_URL_HTTPS" >&2
+  printf "Override Procedure: Verify remote configuration with 'git remote -v'.\n" >&2
+  printf "=======================================================\n\n" >&2
+  exit 1
+fi
+
+# 2. Check commits in the push range
+ZERO_SHA="0000000000000000000000000000000000000000"
+VIOLATIONS=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Ignore branch deletions
+  if [ "$local_sha" = "$ZERO_SHA" ]; then
+    continue
+  fi
+
+  if [ "$remote_sha" = "$ZERO_SHA" ]; then
+    # New branch being pushed: compare against existing remote branches
+    REV_RANGE="$local_sha --not --remotes"
+  else
+    REV_RANGE="$remote_sha..$local_sha"
+  fi
+
+  # Find all files touched across commits in REV_RANGE
+  TOUCHED_FILES=$(git log --name-only --format="" $REV_RANGE 2>/dev/null | sort -u || true)
+
+  for file in $TOUCHED_FILES; do
+    [ -z "$file" ] && continue
+
+    # Check spec-only prefixes
+    for fp in $FORBIDDEN_PATHS; do
+      case "$file" in
+        $fp*|$fp)
+          VIOLATIONS="${VIOLATIONS}
+  - Spec-only path in pushed commit: $file"
+          ;;
+      esac
+    done
+
+    # Check private frontmatter in touched Markdown files
+    case "$file" in
+      *.md|*.markdown)
+        COMMITS_TOUCHING=$(git log --format="%H" $REV_RANGE -- "$file" 2>/dev/null || true)
+        for commit in $COMMITS_TOUCHING; do
+          if git show "$commit:$file" 2>/dev/null | grep -q "^visibility:[[:space:]]*private"; then
+            VIOLATIONS="${VIOLATIONS}
+  - File contains 'visibility: private' in commit $commit: $file"
+            break
+          fi
+        done
+        ;;
+    esac
+  done
+done
+
+if [ -n "$VIOLATIONS" ]; then
+  printf "\n=======================================================\n" >&2
+  printf "❌ PUSH REFUSED: Commits Contain Private Spec Content\n" >&2
+  printf "=======================================================\n" >&2
+  printf "The commits you are trying to push contain files from the private\n" >&2
+  printf "specification repository, which must NEVER reach the public repository:\n" >&2
+  printf "%s\n\n" "$VIOLATIONS" >&2
+  printf "Remediation:\n" >&2
+  printf "  1. Rebase or reset to remove the private commits from your branch.\n" >&2
+  printf "  2. Keep specifications in the private repository (../spec/).\n" >&2
+  printf "\nOverride Procedure:\n" >&2
+  printf "  There is no bypass flag in this hook. The only Git mechanism is\n" >&2
+  printf "  '--no-verify', but workspace policy explicitly FORBIDS '--no-verify'.\n" >&2
+  printf "=======================================================\n\n" >&2
+  exit 1
+fi
+
+exit 0
