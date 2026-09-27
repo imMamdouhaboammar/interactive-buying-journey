@@ -133,3 +133,100 @@ func TestNegativeFixturesFailValidation(t *testing.T) {
 		}
 	})
 }
+
+func TestPreferencesValidation(t *testing.T) {
+	validator, err := contracts.NewValidator("../../contracts/schemas")
+	if err != nil {
+		t.Fatalf("failed to initialize schema validator: %v", err)
+	}
+
+	baseRequestRaw, err := os.ReadFile("../../contracts/examples/compose-request.json")
+	if err != nil {
+		t.Fatalf("failed to read compose-request.json: %v", err)
+	}
+
+	t.Run("TC-PREF-01: valid preferences pass schema validation and deserialize", func(t *testing.T) {
+		var reqMap map[string]any
+		if err := json.Unmarshal(baseRequestRaw, &reqMap); err != nil {
+			t.Fatalf("unmarshal error: %v", err)
+		}
+		reqMap["preferences"] = map[string]any{
+			"purpose":           "portable_work",
+			"max_budget_minor":  120000,
+			"min_battery_hours": 8.5,
+			"max_weight_grams":  1500,
+			"brand_ids":         []string{"brand_demo"},
+		}
+
+		payload, err := json.Marshal(reqMap)
+		if err != nil {
+			t.Fatalf("marshal error: %v", err)
+		}
+
+		if err := validator.Validate("compose-request.schema.json", payload); err != nil {
+			t.Fatalf("valid preferences failed schema validation: %v", err)
+		}
+
+		var req contracts.ComposeRequest
+		if err := json.Unmarshal(payload, &req); err != nil {
+			t.Fatalf("failed deserializing into ComposeRequest: %v", err)
+		}
+		if req.Preferences.Purpose != "portable_work" {
+			t.Errorf("expected purpose 'portable_work', got %q", req.Preferences.Purpose)
+		}
+		if req.Preferences.MaxBudgetMinor == nil || *req.Preferences.MaxBudgetMinor != 120000 {
+			t.Errorf("expected max_budget_minor 120000, got %v", req.Preferences.MaxBudgetMinor)
+		}
+	})
+
+	t.Run("TC-PREF-02: invalid preferences rejected by schema", func(t *testing.T) {
+		cases := []struct {
+			name   string
+			mutate func(p map[string]any)
+		}{
+			{
+				name: "negative budget rejected",
+				mutate: func(p map[string]any) {
+					p["max_budget_minor"] = -500
+				},
+			},
+			{
+				name: "negative battery rejected",
+				mutate: func(p map[string]any) {
+					p["min_battery_hours"] = -2.0
+				},
+			},
+			{
+				name: "zero weight rejected",
+				mutate: func(p map[string]any) {
+					p["max_weight_grams"] = 0
+				},
+			},
+			{
+				name: "too many brand IDs rejected",
+				mutate: func(p map[string]any) {
+					p["brand_ids"] = []string{"b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10", "b11"}
+				},
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				var reqMap map[string]any
+				if err := json.Unmarshal(baseRequestRaw, &reqMap); err != nil {
+					t.Fatalf("unmarshal error: %v", err)
+				}
+				prefs := map[string]any{
+					"purpose": "portable_work",
+				}
+				tc.mutate(prefs)
+				reqMap["preferences"] = prefs
+
+				payload, _ := json.Marshal(reqMap)
+				if err := validator.Validate("compose-request.schema.json", payload); err == nil {
+					t.Errorf("expected validation failure for %s, but passed", tc.name)
+				}
+			})
+		}
+	})
+}
