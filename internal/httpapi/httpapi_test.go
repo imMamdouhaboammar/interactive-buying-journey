@@ -45,7 +45,9 @@ func TestHealthzAndReadyz(t *testing.T) {
 			t.Errorf("expected 200, got %d", rec.Code)
 		}
 		var res map[string]string
-		json.Unmarshal(rec.Body.Bytes(), &res)
+		if err := json.Unmarshal(rec.Body.Bytes(), &res); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
 		if res["status"] != "ok" {
 			t.Errorf("expected status 'ok', got %q", res["status"])
 		}
@@ -60,7 +62,9 @@ func TestHealthzAndReadyz(t *testing.T) {
 			t.Errorf("expected 200, got %d", rec.Code)
 		}
 		var res map[string]string
-		json.Unmarshal(rec.Body.Bytes(), &res)
+		if err := json.Unmarshal(rec.Body.Bytes(), &res); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
 		if res["status"] != "ready" {
 			t.Errorf("expected status 'ready', got %q", res["status"])
 		}
@@ -131,7 +135,9 @@ func TestComposeEndpoint(t *testing.T) {
 
 	t.Run("unknown tenant returns 403 forbidden", func(t *testing.T) {
 		var reqMap map[string]any
-		json.Unmarshal(validPayload, &reqMap)
+		if err := json.Unmarshal(validPayload, &reqMap); err != nil {
+			t.Fatalf("failed to decode validPayload: %v", err)
+		}
 		reqMap["tenant_id"] = "unknown_tenant_xyz"
 		data, _ := json.Marshal(reqMap)
 
@@ -147,7 +153,9 @@ func TestComposeEndpoint(t *testing.T) {
 
 	t.Run("disallowed slot returns 400 bad request", func(t *testing.T) {
 		var reqMap map[string]any
-		json.Unmarshal(validPayload, &reqMap)
+		if err := json.Unmarshal(validPayload, &reqMap); err != nil {
+			t.Fatalf("failed to decode validPayload: %v", err)
+		}
 		reqMap["allowed_slots"] = []any{"disallowed_slot"}
 		data, _ := json.Marshal(reqMap)
 
@@ -174,7 +182,9 @@ func TestComposeEndpoint(t *testing.T) {
 			t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
 		}
 		var plan contracts.ExperiencePlan
-		json.Unmarshal(rec.Body.Bytes(), &plan)
+		if err := json.Unmarshal(rec.Body.Bytes(), &plan); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
 		if plan.Status != "baseline" {
 			t.Errorf("expected status 'baseline', got %q", plan.Status)
 		}

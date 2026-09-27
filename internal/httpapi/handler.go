@@ -79,7 +79,7 @@ func (h *Handler) handleCompose(w http.ResponseWriter, r *http.Request) {
 		h.writeError(w, http.StatusBadRequest, "BAD_REQUEST", "Failed to read request body", reqID)
 		return
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	// Validate request against compose-request.schema.json
 	composeReq, err := h.val.ValidateComposeRequest(body)

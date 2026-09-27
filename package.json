@@ -8,8 +8,8 @@
     "demo-storefront"
   ],
   "scripts": {
-    "typecheck": "npm run --workspaces typecheck",
-    "test": "vitest run",
-    "test:e2e": "playwright test"
+    "typecheck": "bun run --filter '*' typecheck",
+    "test": "bun --filter '@ibj/sdk' test",
+    "test:e2e": "bun --filter 'demo-storefront' test:e2e"
   }
 }
