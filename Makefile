@@ -4,12 +4,14 @@
 .PHONY: all check build test test-go test-sdk test-e2e typecheck contracts licenses secrets clean
 
 PYTHON ?= python3
+GOLANGCI_LINT ?= $(shell which golangci-lint 2>/dev/null || (test -x $(HOME)/go/bin/golangci-lint && echo $(HOME)/go/bin/golangci-lint))
 
 all: check
 
 build:
 	mkdir -p bin
 	go build -o bin/ibj-api ./cmd/ibj-api
+	go build -o bin/ibj-feed ./cmd/ibj-feed
 	cd sdk && bun run build
 	bun build sdk/src/index.ts --outfile demo-storefront/public/sdk.js --target browser
 
@@ -17,14 +19,17 @@ go-vet:
 	go vet ./...
 
 golangci-lint:
-	@which golangci-lint > /dev/null 2>&1 && golangci-lint run ./... || echo "golangci-lint not installed locally, skipping local run (checked in CI)"
+	@if [ -n "$(GOLANGCI_LINT)" ]; then \
+		$(GOLANGCI_LINT) run ./...; \
+	else \
+		echo "golangci-lint not installed locally, skipping local run (checked in CI)"; \
+	fi
 
 test-go:
-	go test -race -v ./...
+	go test -race -v -p 1 ./...
 
 typecheck:
-	cd sdk && bun run typecheck
-	cd demo-storefront && bun run typecheck
+	bun run typecheck
 
 test-sdk:
 	cd sdk && bun run test

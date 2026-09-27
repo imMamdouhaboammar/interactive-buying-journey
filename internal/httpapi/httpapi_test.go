@@ -6,17 +6,20 @@ package httpapi_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/compose"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/contracts"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/httpapi"
+	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/policy"
 )
 
@@ -45,7 +48,9 @@ func TestHealthzAndReadyz(t *testing.T) {
 			t.Errorf("expected 200, got %d", rec.Code)
 		}
 		var res map[string]string
-		json.Unmarshal(rec.Body.Bytes(), &res)
+		if err := json.Unmarshal(rec.Body.Bytes(), &res); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
 		if res["status"] != "ok" {
 			t.Errorf("expected status 'ok', got %q", res["status"])
 		}
@@ -60,7 +65,9 @@ func TestHealthzAndReadyz(t *testing.T) {
 			t.Errorf("expected 200, got %d", rec.Code)
 		}
 		var res map[string]string
-		json.Unmarshal(rec.Body.Bytes(), &res)
+		if err := json.Unmarshal(rec.Body.Bytes(), &res); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
 		if res["status"] != "ready" {
 			t.Errorf("expected status 'ready', got %q", res["status"])
 		}
@@ -131,7 +138,9 @@ func TestComposeEndpoint(t *testing.T) {
 
 	t.Run("unknown tenant returns 403 forbidden", func(t *testing.T) {
 		var reqMap map[string]any
-		json.Unmarshal(validPayload, &reqMap)
+		if err := json.Unmarshal(validPayload, &reqMap); err != nil {
+			t.Fatalf("failed to decode validPayload: %v", err)
+		}
 		reqMap["tenant_id"] = "unknown_tenant_xyz"
 		data, _ := json.Marshal(reqMap)
 
@@ -147,7 +156,9 @@ func TestComposeEndpoint(t *testing.T) {
 
 	t.Run("disallowed slot returns 400 bad request", func(t *testing.T) {
 		var reqMap map[string]any
-		json.Unmarshal(validPayload, &reqMap)
+		if err := json.Unmarshal(validPayload, &reqMap); err != nil {
+			t.Fatalf("failed to decode validPayload: %v", err)
+		}
 		reqMap["allowed_slots"] = []any{"disallowed_slot"}
 		data, _ := json.Marshal(reqMap)
 
@@ -174,9 +185,132 @@ func TestComposeEndpoint(t *testing.T) {
 			t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
 		}
 		var plan contracts.ExperiencePlan
-		json.Unmarshal(rec.Body.Bytes(), &plan)
+		if err := json.Unmarshal(rec.Body.Bytes(), &plan); err != nil {
+			t.Fatalf("failed to decode response: %v", err)
+		}
 		if plan.Status != "baseline" {
 			t.Errorf("expected status 'baseline', got %q", plan.Status)
+		}
+	})
+}
+
+func TestCatalogBatchesEndpoint(t *testing.T) {
+	handler, _ := setupTestServer(t)
+
+	tenantID := "demo_store"
+	secret := "test_secret_123"
+	now := time.Now()
+	tsStr := fmt.Sprintf("%d", now.Unix())
+	body := []byte(fmt.Sprintf(`{"batch_id":"b1","tenant_id":"%s","source":"manual","source_version":"v1","upserts":[],"deletes":[]}`, tenantID))
+	sig := ingest.SignPayload(secret, now.Unix(), body)
+
+	t.Run("TC-AUTH-01: missing X-IBJ-Tenant header returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for missing tenant header, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-02: missing X-IBJ-Timestamp header returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for missing timestamp header, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-03: missing X-IBJ-Signature header returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for missing signature header, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-TRANS-04: non-json content-type returns 415", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "text/plain")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnsupportedMediaType {
+			t.Errorf("expected 415 for text/plain, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-05: invalid signature returns 401", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", "v1=0000000000000000000000000000000000000000000000000000000000000000")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 for invalid signature, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-AUTH-12: tenant mismatch returns 403", func(t *testing.T) {
+		mismatchBody := []byte(`{"batch_id":"b1","tenant_id":"different_tenant","source":"manual","source_version":"v1","upserts":[],"deletes":[]}`)
+		mismatchSig := ingest.SignPayload(secret, now.Unix(), mismatchBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(mismatchBody))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", mismatchSig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusForbidden {
+			t.Errorf("expected 403 for tenant mismatch, got %d: %s", rec.Code, rec.Body.String())
+		}
+	})
+
+	t.Run("TC-TRANS-01: payload > 1MB returns 413", func(t *testing.T) {
+		hugeBody := make([]byte, (1<<20)+2)
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(hugeBody))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusRequestEntityTooLarge {
+			t.Errorf("expected 413 for oversized payload, got %d", rec.Code)
+		}
+	})
+
+	t.Run("valid batch returns 202 accepted", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/catalog/batches", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-IBJ-Tenant", tenantID)
+		req.Header.Set("X-IBJ-Timestamp", tsStr)
+		req.Header.Set("X-IBJ-Signature", sig)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusAccepted {
+			t.Errorf("expected 202 accepted, got %d: %s", rec.Code, rec.Body.String())
 		}
 	})
 }

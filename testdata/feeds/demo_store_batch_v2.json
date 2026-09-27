@@ -1,0 +1,99 @@
+{
+  "batch_id": "batch_demo_002",
+  "tenant_id": "demo_store",
+  "source": "mock_connector",
+  "source_version": "v2.0",
+  "upserts": [
+    {
+      "product_id": "prod_lap_01",
+      "variant_id": "v1-001",
+      "sku": "APX-PRO-14",
+      "title": "UltraBook Pro 14 / ألترا بوك برو ١٤",
+      "category": "laptops",
+      "brand": "Apex",
+      "published": true,
+      "currency": "USD",
+      "price_minor": 119900,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1200,
+        "battery_wh": 65,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T12:00:00Z"
+    },
+    {
+      "product_id": "prod_lap_03",
+      "variant_id": "v1-003",
+      "sku": "NOV-AIR-13",
+      "title": "Nova Book Air / نوفا بوك إير",
+      "category": "laptops",
+      "brand": "Nova",
+      "published": true,
+      "currency": "USD",
+      "price_minor": 115000,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1250,
+        "battery_wh": 55,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T12:00:00Z"
+    },
+    {
+      "product_id": "prod_lap_04",
+      "variant_id": "v1-004",
+      "sku": "NOV-WRK-16",
+      "title": "Nova Workstation 16 / نوفا محطة عمل",
+      "category": "laptops",
+      "brand": "Nova",
+      "published": true,
+      "currency": "USD",
+      "price_minor": 209900,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1950,
+        "battery_wh": 90,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T12:00:00Z"
+    },
+    {
+      "product_id": "prod_lap_08",
+      "variant_id": "v2-001",
+      "sku": "APX-USLM-15",
+      "title": "Apex Ultra Slim 15 / أيبكس ألترا سليم",
+      "category": "laptops",
+      "brand": "Apex",
+      "published": true,
+      "currency": "USD",
+      "price_minor": 139900,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1350,
+        "battery_wh": 70,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T12:00:00Z"
+    },
+    {
+      "product_id": "prod_acc_04",
+      "variant_id": "v2-002",
+      "sku": "NOV-HUB-7P",
+      "title": "Nova Multiport Hub / موزع منافذ نوفا",
+      "category": "accessories",
+      "brand": "Nova",
+      "published": true,
+      "currency": "USD",
+      "price_minor": 5900,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "ports": 7
+      },
+      "source_updated_at": "2026-09-26T12:00:00Z"
+    }
+  ],
+  "deletes": [
+    "v1-002"
+  ]
+}

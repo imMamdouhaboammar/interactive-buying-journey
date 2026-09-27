@@ -48,7 +48,7 @@ jobs:
       - name: Secret Scan (Gitleaks)
         run: gitleaks detect --verbose --redact
 
-      - name: Install npm dependencies
+      - name: Install Bun workspace dependencies
         run: bun install --frozen-lockfile
 
       - name: Install go-licenses
@@ -60,6 +60,20 @@ jobs:
   go-suite:
     name: Go Modular Monolith Suite
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: ibj_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,16 +84,31 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
 
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.6
+
       - name: Go Vet
         run: go vet ./...
 
       - name: Go Test with Race Detector
-        run: go test -race -v ./...
+        env:
+          IBJ_TEST_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/ibj_test?sslmode=disable
+          IBJ_REQUIRE_DB: "1"
+        run: go test -race -v -short ./...
 
-      - name: Build Go API Server
+      - name: Run 10k Variants Benchmark
+        env:
+          IBJ_TEST_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/ibj_test?sslmode=disable
+          IBJ_REQUIRE_DB: "1"
+        run: go test -v -run TestBenchmark_10kVariants -timeout 120s ./internal/catalog
+
+      - name: Build Go Binaries
         run: |
           mkdir -p bin
           go build -o bin/ibj-api ./cmd/ibj-api
+          go build -o bin/ibj-feed ./cmd/ibj-feed
 
   ts-and-e2e:
     name: TypeScript SDK & Storefront E2E Suite

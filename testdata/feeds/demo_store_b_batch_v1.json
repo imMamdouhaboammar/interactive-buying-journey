@@ -1,0 +1,45 @@
+{
+  "batch_id": "batch_b_001",
+  "tenant_id": "demo_store_b",
+  "source": "mock_connector",
+  "source_version": "v1.0",
+  "upserts": [
+    {
+      "product_id": "prod_b_lap_01",
+      "variant_id": "vb-001",
+      "sku": "DST-OAS-14",
+      "title": "DesertTech Oasis 14 / ديزرت تك واحة ١٤",
+      "category": "laptops",
+      "brand": "DesertTech",
+      "published": true,
+      "currency": "SAR",
+      "price_minor": 450000,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1300,
+        "battery_wh": 60,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T10:00:00Z"
+    },
+    {
+      "product_id": "prod_b_lap_02",
+      "variant_id": "vb-002",
+      "sku": "DST-FAL-16",
+      "title": "DesertTech Falcon 16 / ديزرت تك فالكون ١٦",
+      "category": "laptops",
+      "brand": "DesertTech",
+      "published": true,
+      "currency": "SAR",
+      "price_minor": 720000,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": 1800,
+        "battery_wh": 85,
+        "usb_c_pd": true
+      },
+      "source_updated_at": "2026-09-26T10:00:00Z"
+    }
+  ],
+  "deletes": []
+}

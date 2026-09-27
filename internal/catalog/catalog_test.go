@@ -63,6 +63,24 @@ func TestInMemoryCatalog_ListLaptops(t *testing.T) {
 			t.Errorf("expected error for unknown tenant, got nil")
 		}
 	})
+
+	t.Run("returns deterministic order across repeated invocations", func(t *testing.T) {
+		first, err := repo.ListLaptops(ctx, "demo_store")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		for i := 0; i < 50; i++ {
+			subsequent, err := repo.ListLaptops(ctx, "demo_store")
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			for j := range first {
+				if first[j].ID != subsequent[j].ID {
+					t.Fatalf("ordering is nondeterministic: at call %d, index %d expected %s got %s", i, j, first[j].ID, subsequent[j].ID)
+				}
+			}
+		}
+	})
 }
 
 func TestInMemoryCatalog_GetVariant(t *testing.T) {

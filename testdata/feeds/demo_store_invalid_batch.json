@@ -1,0 +1,25 @@
+{
+  "batch_id": "batch_invalid_001",
+  "tenant_id": "demo_store",
+  "source": "mock_connector",
+  "source_version": "v1.0",
+  "upserts": [
+    {
+      "product_id": "prod_lap_invalid",
+      "variant_id": "v_inv_001",
+      "sku": "INV-LAP-01",
+      "title": "Invalid Laptop with Negative Price",
+      "category": "laptops",
+      "brand": "Apex",
+      "published": true,
+      "currency": "INVALID",
+      "price_minor": -500,
+      "inventory_status": "in_stock",
+      "attributes": {
+        "weight_g": -100
+      },
+      "source_updated_at": "2026-09-26T10:00:00Z"
+    }
+  ],
+  "deletes": []
+}

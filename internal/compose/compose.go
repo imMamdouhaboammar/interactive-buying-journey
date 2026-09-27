@@ -10,12 +10,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/catalog"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/contracts"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/policy"
 )
+
+// Clock returns the current time.
+type Clock func() time.Time
+
+// IDGenerator generates unique IDs with the given prefix.
+type IDGenerator func(prefix string) string
 
 // JourneyState represents the lifecycle phase of a compose request.
 type JourneyState string
@@ -31,21 +38,39 @@ const (
 
 // Composer coordinates catalog, policy, and contracts to synthesize experience plans.
 type Composer struct {
-	catalog catalog.CatalogPort
-	policy  *policy.PolicyChecker
-	val     *contracts.Validator
+	catalog          catalog.CatalogPort
+	policy           *policy.PolicyChecker
+	val              *contracts.Validator
+	clock            Clock
+	idGen            IDGenerator
+	versionMu        sync.RWMutex
+	lastKnownVersion map[string]string
 }
 
-// NewComposer creates a new journey composer.
+// NewComposer creates a new journey composer with default clock and ID generator.
 func NewComposer(cat catalog.CatalogPort, pol *policy.PolicyChecker, val *contracts.Validator) *Composer {
+	return NewComposerWithClockAndID(cat, pol, val, time.Now, defaultIDGenerator)
+}
+
+// NewComposerWithClockAndID creates a composer with injected clock and ID generator for deterministic testing.
+func NewComposerWithClockAndID(cat catalog.CatalogPort, pol *policy.PolicyChecker, val *contracts.Validator, clock Clock, idGen IDGenerator) *Composer {
+	if clock == nil {
+		clock = time.Now
+	}
+	if idGen == nil {
+		idGen = defaultIDGenerator
+	}
 	return &Composer{
-		catalog: cat,
-		policy:  pol,
-		val:     val,
+		catalog:          cat,
+		policy:           pol,
+		val:              val,
+		clock:            clock,
+		idGen:            idGen,
+		lastKnownVersion: make(map[string]string),
 	}
 }
 
-func generateID(prefix string) string {
+func defaultIDGenerator(prefix string) string {
 	b := make([]byte, 8)
 	_, _ = rand.Read(b)
 	return fmt.Sprintf("%s_%s", prefix, hex.EncodeToString(b))
@@ -53,8 +78,6 @@ func generateID(prefix string) string {
 
 // ComposeJourney synthesizes an experience plan according to the request lifecycle.
 func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeRequest) (*contracts.ExperiencePlan, error) {
-	state := StateBaseline
-
 	// Policy enforcement: Tenant validation
 	if err := c.policy.ValidateTenant(ctx, req.TenantID); err != nil {
 		return nil, fmt.Errorf("tenant policy validation failed: %w", err)
@@ -65,21 +88,41 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 		return nil, fmt.Errorf("slot policy validation failed: %w", err)
 	}
 
-	// Kill Switch check
-	if !c.policy.IsAdaptationEnabled() {
-		state = StateBaselineFallback
-		reason := "adaptation_disabled_by_kill_switch"
-		return c.buildBaselinePlan(req, &reason), nil
+	// Determine active catalog projection version
+	activeVer, catErr := c.catalog.GetActiveVersion(ctx, req.TenantID)
+	var fallbackReason *string
+	catalogVersion := activeVer
+	if catErr != nil {
+		slog.Warn("catalog store unavailable; falling back to last known version",
+			"tenant_id", req.TenantID,
+			"error", catErr,
+		)
+		reason := "catalog_unavailable"
+		fallbackReason = &reason
+
+		c.versionMu.RLock()
+		cached, ok := c.lastKnownVersion[req.TenantID]
+		c.versionMu.RUnlock()
+
+		if ok && cached != "" {
+			catalogVersion = cached
+		} else {
+			catalogVersion = "unavailable"
+		}
+	} else {
+		c.versionMu.Lock()
+		c.lastKnownVersion[req.TenantID] = activeVer
+		c.versionMu.Unlock()
 	}
 
-	state = StateContextReady
-	_ = state
-
-	// Candidate retrieval (verifies catalog snapshot presence)
-	state = StateCandidatesReady
+	// Kill Switch check
+	if !c.policy.IsAdaptationEnabled() {
+		reason := "adaptation_disabled_by_kill_switch"
+		return c.buildBaselinePlan(req, catalogVersion, &reason), nil
+	}
 
 	// Build baseline plan (in Slice 1, adaptation is baseline-first with no decision model)
-	plan := c.buildBaselinePlan(req, nil)
+	plan := c.buildBaselinePlan(req, catalogVersion, fallbackReason)
 
 	// Runtime self-validation: ensure the plan is valid against experience-plan.schema.json
 	data, err := json.Marshal(plan)
@@ -90,7 +133,7 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 			"error", err,
 		)
 		reason := "plan_marshal_error"
-		return c.buildFallbackBaseline(req, reason), nil
+		return c.buildFallbackBaseline(req, catalogVersion, reason), nil
 	}
 
 	if err := c.val.Validate("experience-plan.schema.json", data); err != nil {
@@ -100,25 +143,23 @@ func (c *Composer) ComposeJourney(ctx context.Context, req *contracts.ComposeReq
 			"error", err,
 		)
 		reason := "schema_validation_server_bug"
-		return c.buildFallbackBaseline(req, reason), nil
+		return c.buildFallbackBaseline(req, catalogVersion, reason), nil
 	}
 
-	state = StatePlanValidated
-	_ = state
 	return plan, nil
 }
 
-func (c *Composer) buildBaselinePlan(req *contracts.ComposeRequest, fallbackReason *string) *contracts.ExperiencePlan {
+func (c *Composer) buildBaselinePlan(req *contracts.ComposeRequest, catalogVersion string, fallbackReason *string) *contracts.ExperiencePlan {
 	return &contracts.ExperiencePlan{
 		ContractVersion: "1.0",
 		RequestID:       req.RequestID,
-		PlanID:          generateID("pl"),
+		PlanID:          c.idGen("pl"),
 		TenantID:        req.TenantID,
 		Status:          "baseline",
 		Locale:          req.Locale,
-		CatalogVersion:  "cat_demo_v1",
+		CatalogVersion:  catalogVersion,
 		PolicyVersion:   "pol_demo_v1",
-		ExpiresAt:       time.Now().UTC().Add(5 * time.Minute).Format(time.RFC3339),
+		ExpiresAt:       c.clock().UTC().Add(5 * time.Minute).Format(time.RFC3339),
 		Sections:        []contracts.PlanSection{}, // Empty sections for baseline plan
 		Provenance: contracts.PlanProvenance{
 			Strategy:       "merchant_baseline",
@@ -129,6 +170,6 @@ func (c *Composer) buildBaselinePlan(req *contracts.ComposeRequest, fallbackReas
 	}
 }
 
-func (c *Composer) buildFallbackBaseline(req *contracts.ComposeRequest, reason string) *contracts.ExperiencePlan {
-	return c.buildBaselinePlan(req, &reason)
+func (c *Composer) buildFallbackBaseline(req *contracts.ComposeRequest, catalogVersion string, reason string) *contracts.ExperiencePlan {
+	return c.buildBaselinePlan(req, catalogVersion, &reason)
 }

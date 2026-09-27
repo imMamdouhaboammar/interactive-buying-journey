@@ -1,0 +1,36 @@
+# Copyright (c) 2026 Mamdouh Aboammar
+# SPDX-License-Identifier: PolyForm-Shield-1.0.0
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+    - unconvert
+    - revive
+
+linters-settings:
+  govet:
+    enable-all: false
+  revive:
+    rules:
+      - name: exported
+        disabled: true
+      - name: package-comments
+        disabled: true
+
+issues:
+  exclude-dirs:
+    - node_modules
+    - vendor
+    - demo-storefront
+    - sdk
+  exclude-use-default: false
