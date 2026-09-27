@@ -121,7 +121,7 @@ function renderPage(locale: "en" | "ar", ibjEndpoint: string): string {
 
     return `
       <article class="product-card" data-product-id="${p.id}">
-        <h2>${pTitle}</h2>
+        <h3>${pTitle}</h3>
         <p class="price">$${p.price_usd.toLocaleString()}.00</p>
         <p class="status ${p.in_stock ? "in-stock" : "out-of-stock"}">${stockLabel(p.in_stock)}</p>
         <ul class="specs">
@@ -208,10 +208,17 @@ function renderPage(locale: "en" | "ar", ibjEndpoint: string): string {
       flex-direction: column;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .product-card h2 {
+    .product-card h3 {
       margin-top: 0;
       font-size: 1.15rem;
       margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 1.5rem 0 1rem 0;
+      color: var(--text-main);
     }
     .price {
       font-size: 1.25rem;
@@ -252,6 +259,185 @@ function renderPage(locale: "en" | "ar", ibjEndpoint: string): string {
       background-color: #94a3b8;
       cursor: not-allowed;
     }
+
+    /* Discovery Card & Intent Picker */
+    .intent-card, .ibj-intent-picker {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .ibj-intent-header {
+      margin-bottom: 0.875rem;
+    }
+    .ibj-intent-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .ibj-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .chip-btn, .ibj-chip, .ibj-budget-chip, .ibj-reset-button {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #94a3b8;
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .chip-btn:hover, .ibj-chip:hover, .ibj-budget-chip:hover {
+      background: #e2e8f0;
+      border-color: #64748b;
+    }
+    .chip-btn:focus, .ibj-chip:focus, .ibj-budget-chip:focus, .ibj-reset-button:focus {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+    .ibj-budget-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .ibj-budget-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-inline-end: 0.5rem;
+    }
+    .ibj-reset-button {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+      border-radius: 0.375rem;
+    }
+    .ibj-reset-button:hover {
+      background: #fecaca;
+    }
+
+    /* Product Strip (Adapted Section) */
+    .ibj-product-strip {
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      border-radius: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .ibj-strip-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .ibj-strip-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #14532d;
+    }
+    .ibj-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+    }
+    .ibj-badge {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+      border-radius: 9999px;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .ibj-cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .ibj-product-card {
+      background: #ffffff;
+      border: 1px solid #bbf7d0;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .ibj-product-card h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+    .ibj-card-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0 0 0.5rem 0;
+    }
+    .ibj-match-tag {
+      display: inline-block;
+      align-self: flex-start;
+      background: #f0fdf4;
+      color: #166534;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.25rem;
+      border: 1px solid #86efac;
+    }
+
+    /* Empty State */
+    .ibj-empty-state {
+      background: #fef2f2;
+      border: 1px dashed #f87171;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .ibj-empty-message {
+      margin: 0 0 1rem 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #991b1b;
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding: 0.75rem 1rem;
+      }
+      main {
+        margin: 1rem auto;
+        padding: 0 0.75rem;
+      }
+      .intent-card, .ibj-intent-picker, .ibj-product-strip {
+        padding: 1rem;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .ibj-cards-container {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -263,7 +449,43 @@ function renderPage(locale: "en" | "ar", ibjEndpoint: string): string {
   </header>
 
   <main>
-    <div id="collection_top" data-ibj-slot="collection_top"></div>
+    <div id="collection_top" data-ibj-slot="collection_top">
+      <div class="ibj-intent-picker intent-card">
+        <div class="ibj-intent-header">
+          <h2 class="ibj-intent-title">${isAr ? "ما الذي يهمك أكثر؟" : "What matters most?"}</h2>
+        </div>
+        <div class="ibj-chip-list" role="group" aria-label="${isAr ? "ما الذي يهمك أكثر؟" : "What matters most?"}">
+          <button type="button" class="ibj-chip chip-btn" data-ibj-intent="portable_work" aria-label="${isAr ? "عمل متنقل" : "Portable Work"}">
+            ${isAr ? "عمل متنقل" : "Portable Work"}
+          </button>
+          <button type="button" class="ibj-chip chip-btn" data-ibj-intent="performance" aria-label="${isAr ? "أداء عالي" : "Performance"}">
+            ${isAr ? "أداء عالي" : "Performance"}
+          </button>
+          <button type="button" class="ibj-chip chip-btn" data-ibj-intent="everyday_value" aria-label="${isAr ? "استخدام يومي اقتصادي" : "Everyday Value"}">
+            ${isAr ? "استخدام يومي اقتصادي" : "Everyday Value"}
+          </button>
+        </div>
+        <div class="ibj-budget-group">
+          <span class="ibj-budget-label">${isAr ? "الميزانية:" : "Budget:"}</span>
+          <button type="button" class="ibj-budget-chip chip-btn" data-ibj-budget="50000" aria-label="${isAr ? "حتى $500" : "Up to $500"}">
+            ${isAr ? "حتى $500" : "Up to $500"}
+          </button>
+          <button type="button" class="ibj-budget-chip chip-btn" data-ibj-budget="100000" aria-label="${isAr ? "حتى $1,000" : "Up to $1,000"}">
+            ${isAr ? "حتى $1,000" : "Up to $1,000"}
+          </button>
+          <button type="button" class="ibj-budget-chip chip-btn" data-ibj-budget="120000" aria-label="${isAr ? "حتى $1,200" : "Up to $1,200"}">
+            ${isAr ? "حتى $1,200" : "Up to $1,200"}
+          </button>
+          <button type="button" class="ibj-budget-chip chip-btn" data-ibj-budget="150000" aria-label="${isAr ? "حتى $1,500" : "Up to $1,500"}">
+            ${isAr ? "حتى $1,500" : "Up to $1,500"}
+          </button>
+          <button type="button" class="ibj-reset-button chip-btn" data-ibj-action="reset" aria-label="${isAr ? "إعادة الضبط" : "Reset preferences"}">
+            ${isAr ? "إعادة الضبط" : "Reset"}
+          </button>
+        </div>
+      </div>
+    </div>
+    <h2 class="section-title">${isAr ? "جميع الحواسيب المحمولة" : "All Laptops"}</h2>
     <section class="grid" aria-label="${isAr ? "قائمة المنتجات" : "Product listing"}">
       ${productCards}
     </section>
@@ -278,17 +500,52 @@ function renderPage(locale: "en" | "ar", ibjEndpoint: string): string {
         endpoint: endpoint,
         timeoutMs: 350,
       });
+      window.__ibjClient = client;
 
-      await client.apply({
-        requestId: "req_" + Math.random().toString(36).substring(2, 10),
-        sessionToken: "sess_demo_storefront",
-        locale: "${locale}",
-        page: {
-          kind: "collection",
-          categoryId: "laptops"
-        },
-        allowedSlots: ["collection_top"]
-      });
+      let currentPreferences = {};
+
+      const applyPrefs = async (prefs) => {
+        currentPreferences = prefs;
+        await client.apply({
+          requestId: "req_" + Math.random().toString(36).substring(2, 10),
+          sessionToken: "sess_demo_storefront",
+          locale: "${locale}",
+          currency: "USD",
+          page: {
+            kind: "collection",
+            categoryId: "laptops"
+          },
+          preferences: currentPreferences,
+          allowedSlots: ["collection_top"]
+        });
+      };
+
+      const topSlot = document.getElementById("collection_top");
+      if (topSlot) {
+        topSlot.addEventListener("click", (e) => {
+          const btn = e.target.closest("button");
+          if (!btn) return;
+          if (btn.closest(".ibj-experience-container")) return;
+
+          const intent = btn.getAttribute("data-ibj-intent");
+          if (intent) {
+            applyPrefs({ ...currentPreferences, purpose: intent });
+            return;
+          }
+
+          const budget = btn.getAttribute("data-ibj-budget");
+          if (budget) {
+            applyPrefs({ ...currentPreferences, maxBudgetMinor: parseInt(budget, 10) });
+            return;
+          }
+
+          const action = btn.getAttribute("data-ibj-action");
+          if (action === "reset") {
+            applyPrefs({});
+            return;
+          }
+        });
+      }
     } catch (err) {
       // SDK guarantees fail-open: never block or throw to host page
     }

@@ -56,8 +56,8 @@ func setupServiceTest(t *testing.T) (*postgres.DB, *ingest.Service, string, func
 
 	tenantID := fmt.Sprintf("tenant_%d", time.Now().UnixNano())
 	_, err = db.Pool().Exec(context.Background(), `
-		INSERT INTO tenants (tenant_id, name, secret_current)
-		VALUES ($1, 'Test Tenant', 'test_secret')
+		INSERT INTO tenants (tenant_id, name, secret_key_ref)
+		VALUES ($1, 'Test Tenant', 'ref_test')
 		ON CONFLICT (tenant_id) DO NOTHING
 	`, tenantID)
 	if err != nil {

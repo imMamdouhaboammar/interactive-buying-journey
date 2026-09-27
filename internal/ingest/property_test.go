@@ -52,8 +52,8 @@ func TestProperty_BatchPermutationConvergence(t *testing.T) {
 
 		// Seed tenants
 		_, _ = db.Pool().Exec(context.Background(), `
-			INSERT INTO tenants (tenant_id, name, secret_current)
-			VALUES ($1, 'Tenant A', 'secret'), ($2, 'Tenant B', 'secret')
+			INSERT INTO tenants (tenant_id, name, secret_key_ref)
+			VALUES ($1, 'Tenant A', 'ref_a'), ($2, 'Tenant B', 'ref_b')
 			ON CONFLICT (tenant_id) DO NOTHING
 		`, tenantA, tenantB)
 

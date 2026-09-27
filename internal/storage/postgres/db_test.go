@@ -6,6 +6,7 @@ package postgres_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -70,8 +71,8 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 
 	// Seed tenant records
 	_, err := db.Pool().Exec(ctx, `
-		INSERT INTO tenants (tenant_id, name, secret_current)
-		VALUES ($1, 'Tenant A', 'secret_a'), ($2, 'Tenant B', 'secret_b')
+		INSERT INTO tenants (tenant_id, name, secret_key_ref)
+		VALUES ($1, 'Tenant A', 'ref_a'), ($2, 'Tenant B', 'ref_b')
 		ON CONFLICT (tenant_id) DO NOTHING
 	`, tenantA, tenantB)
 	if err != nil {
@@ -215,6 +216,111 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 		})
 		if err == nil || !strings.Contains(err.Error(), "violates row-level security policy") {
 			t.Fatalf("expected error mentioning row-level security policy violation, got: %v", err)
+		}
+	})
+
+	t.Run("TC-DEBT-04: tenants table stores only key reference and no plaintext secrets", func(t *testing.T) {
+		var secretCols int
+		err := db.Pool().QueryRow(ctx, `
+			SELECT count(*)
+			FROM information_schema.columns
+			WHERE table_name = 'tenants' AND column_name IN ('secret_current', 'secret_previous')
+		`).Scan(&secretCols)
+		if err != nil {
+			t.Fatalf("query failed: %v", err)
+		}
+		if secretCols != 0 {
+			t.Fatalf("TC-DEBT-04 violated: found %d plaintext secret columns in tenants table, expected 0", secretCols)
+		}
+
+		var refCol int
+		err = db.Pool().QueryRow(ctx, `
+			SELECT count(*)
+			FROM information_schema.columns
+			WHERE table_name = 'tenants' AND column_name = 'secret_key_ref'
+		`).Scan(&refCol)
+		if err != nil {
+			t.Fatalf("query failed: %v", err)
+		}
+		if refCol != 1 {
+			t.Fatalf("TC-DEBT-04 violated: expected secret_key_ref column in tenants table, got %d", refCol)
+		}
+	})
+
+	t.Run("TC-DEBT-06: toolchain consistency across CI, AGENTS.md, and ADR-0005", func(t *testing.T) {
+		ciContent, err := os.ReadFile("../../../.github/workflows/ci.yml")
+		if err != nil {
+			t.Fatalf("failed reading ci.yml: %v", err)
+		}
+		if !strings.Contains(string(ciContent), "image: postgres:17-alpine") {
+			t.Errorf("TC-DEBT-06: CI workflow does not pin postgres:17-alpine (expected ADR-0005 standard)")
+		}
+
+		agentsContent, err := os.ReadFile("../../../AGENTS.md")
+		if err != nil {
+			t.Fatalf("failed reading AGENTS.md: %v", err)
+		}
+		if strings.Contains(string(agentsContent), "Redis") {
+			t.Errorf("TC-DEBT-06: AGENTS.md lists unused Redis in target stack")
+		}
+		if !strings.Contains(string(agentsContent), "PostgreSQL 17") {
+			t.Errorf("TC-DEBT-06: AGENTS.md does not specify PostgreSQL 17")
+		}
+
+		adrContent, err := os.ReadFile("../../../docs/decisions/0005-t02-persistence-and-ingest.md")
+		if err != nil {
+			t.Fatalf("failed reading ADR-0005: %v", err)
+		}
+		if !strings.Contains(string(adrContent), "postgres:17-alpine") {
+			t.Errorf("TC-DEBT-06: ADR-0005 does not specify postgres:17-alpine")
+		}
+	})
+
+	t.Run("TC-PREF-00: merchant_intent_rules table exists and enforces RLS isolation", func(t *testing.T) {
+		var tableCount int
+		err := db.Pool().QueryRow(ctx, `
+			SELECT count(*)
+			FROM information_schema.tables
+			WHERE table_name = 'merchant_intent_rules'
+		`).Scan(&tableCount)
+		if err != nil {
+			t.Fatalf("query failed: %v", err)
+		}
+		if tableCount != 1 {
+			t.Fatalf("TC-PREF-00 violated: expected merchant_intent_rules table to exist, got %d", tableCount)
+		}
+
+		ruleID := fmt.Sprintf("rule_a_%d", time.Now().UnixNano())
+		err = db.WithTenantTx(ctx, tenantA, func(tx pgx.Tx) error {
+			_, err := tx.Exec(ctx, `
+				INSERT INTO merchant_intent_rules (rule_id, tenant_id, category_id, intent_key, label_en, label_ar, max_weight_grams, min_battery_hours)
+				VALUES ($1, $2, 'laptops', 'portable_work', 'Portable Work', 'عمل متنقل', 1500, 8.0)
+				ON CONFLICT (tenant_id, category_id, intent_key) DO UPDATE SET
+					label_en = EXCLUDED.label_en,
+					label_ar = EXCLUDED.label_ar,
+					max_weight_grams = EXCLUDED.max_weight_grams,
+					min_battery_hours = EXCLUDED.min_battery_hours
+			`, ruleID, tenantA)
+			return err
+		})
+		if err != nil {
+			t.Fatalf("failed inserting rule for tenantA: %v", err)
+		}
+
+		err = db.WithTenantTx(ctx, tenantB, func(tx pgx.Tx) error {
+			_, _ = tx.Exec(ctx, "SET ROLE ibj_test_app")
+			var count int
+			err := tx.QueryRow(ctx, "SELECT count(*) FROM merchant_intent_rules").Scan(&count)
+			if err != nil {
+				return err
+			}
+			if count != 0 {
+				return errors.New("RLS leak: tenantB saw rules from tenantA")
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("cross-tenant isolation failed: %v", err)
 		}
 	})
 

@@ -24,7 +24,7 @@ archive_reason: null
 
 # AGENTS.md — Agent Operating Constitution for IBJ Codebase
 
-> **Status:** Implementation Codebase | **Target Stack:** Go 1.25+, TypeScript (Bun), PostgreSQL 16, Redis | **Version:** 0.1.0
+> **Status:** Implementation Codebase | **Target Stack:** Go 1.25+, TypeScript (Bun), PostgreSQL 17 | **Version:** 0.1.0
 
 This repository is the **public implementation** for the Interactive Buying Journey (IBJ) engine. All AI coding, planning, and review agents operating within this repository must strictly adhere to the instructions, constraints, and boundaries defined below.
 

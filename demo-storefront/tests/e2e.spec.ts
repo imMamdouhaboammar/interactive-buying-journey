@@ -248,3 +248,187 @@ test.describe("Interactive Buying Journey Storefront Baseline", () => {
     await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-ar-engine-timeout.png") });
   });
 });
+
+test.describe("Interactive Buying Journey Preference Adaptation & Storefront Tracer", () => {
+  test("Clicking portable_work intent chip renders adapted product strip with reason badges", async ({ page }) => {
+    const consoleErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") consoleErrors.push(msg.text());
+    });
+
+    await page.goto(`http://127.0.0.1:${STOREFRONT_PORT}/en`);
+
+    // Wait for intent picker to load in collection_top slot
+    const intentPicker = page.locator("#collection_top .ibj-intent-picker");
+    await expect(intentPicker).toBeVisible();
+
+    const portableChip = page.locator('button[data-ibj-intent="portable_work"]');
+    await expect(portableChip).toBeVisible();
+    await expect(portableChip).toHaveText("Portable Work");
+
+    // Click portable_work chip
+    await portableChip.click();
+
+    // Verify product strip appears with adapted recommendations
+    const productStrip = page.locator("#collection_top .ibj-product-strip");
+    await expect(productStrip).toBeVisible();
+
+    // Verify reason badges
+    const badges = productStrip.locator(".ibj-badge");
+    await expect(badges.first()).toBeVisible();
+    const badgeTexts = await badges.allTextContents();
+    expect(badgeTexts.some((b) => b.includes("Lightweight") || b.includes("Within budget") || b.includes("Verified specs"))).toBe(true);
+
+    // Verify recommended cards (lap_007, lap_001, lap_002 are top portable laptops)
+    const cards = productStrip.locator(".ibj-product-card");
+    const count = await cards.count();
+    expect(count).toBeGreaterThanOrEqual(1);
+
+    // Verify focus is retained on portable_work button
+    await expect(portableChip).toBeFocused();
+
+    // Verify accessibility with adapted strip
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
+
+    expect(consoleErrors).toEqual([]);
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-en-adapted-portable.png") });
+  });
+
+  test("Clicking budget under $1,000 filters variants to affordable laptops", async ({ page }) => {
+    await page.goto(`http://127.0.0.1:${STOREFRONT_PORT}/en`);
+
+    const budgetChip = page.locator('button[data-ibj-budget="100000"]');
+    await expect(budgetChip).toBeVisible();
+    await budgetChip.click();
+
+    const productStrip = page.locator("#collection_top .ibj-product-strip");
+    await expect(productStrip).toBeVisible();
+
+    // In demo catalog, only lap_004 ($799) and lap_006 ($999) are <= $1,000
+    const cards = productStrip.locator(".ibj-product-card");
+    const count = await cards.count();
+    expect(count).toBe(2);
+
+    const variantIds = await cards.evaluateAll((elems) =>
+      elems.map((e) => e.getAttribute("data-variant-id")),
+    );
+    expect(variantIds).toContain("lap_004");
+    expect(variantIds).toContain("lap_006");
+    expect(variantIds).not.toContain("lap_001"); // $1,099 exceeds budget
+
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-en-budget-filter.png") });
+  });
+
+  test("Clicking reset button clears adapted strip and restores baseline", async ({ page }) => {
+    await page.goto(`http://127.0.0.1:${STOREFRONT_PORT}/en`);
+
+    // First click portable_work
+    const portableChip = page.locator('button[data-ibj-intent="portable_work"]');
+    await portableChip.click();
+    await expect(page.locator("#collection_top .ibj-product-strip")).toBeVisible();
+
+    // Now click reset
+    const resetBtn = page.locator('.ibj-intent-picker button[data-ibj-action="reset"]');
+    await expect(resetBtn).toBeVisible();
+    await resetBtn.click();
+
+    // Product strip should be removed, leaving only baseline intent picker
+    await expect(page.locator("#collection_top .ibj-product-strip")).not.toBeVisible();
+    await expect(page.locator("#collection_top .ibj-intent-picker")).toBeVisible();
+
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-en-reset.png") });
+  });
+
+  test("Arabic page renders RTL layout, Arabic labels, and localized reason badges", async ({ page }) => {
+    await page.goto(`http://127.0.0.1:${STOREFRONT_PORT}/ar`);
+
+    const intentPicker = page.locator("#collection_top .ibj-intent-picker");
+    await expect(intentPicker).toBeVisible();
+
+    // Verify Arabic chip label
+    const portableChip = page.locator('button[data-ibj-intent="portable_work"]');
+    await expect(portableChip).toBeVisible();
+    await expect(portableChip).toHaveText("عمل متنقل");
+
+    await portableChip.click();
+
+    const productStrip = page.locator("#collection_top .ibj-product-strip");
+    await expect(productStrip).toBeVisible();
+
+    // Verify Arabic reason badges
+    const badges = productStrip.locator(".ibj-badge");
+    const badgeTexts = await badges.allTextContents();
+    expect(badgeTexts.some((b) => b.includes("خفيف") || b.includes("ميزانيتك") || b.includes("معتمدة"))).toBe(true);
+
+    // Verify RTL attribute on experience container
+    const container = page.locator("#collection_top .ibj-experience-container");
+    await expect(container).toHaveAttribute("dir", "rtl");
+
+    // Accessibility check on Arabic adapted page
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
+
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-ar-adapted-portable.png") });
+  });
+
+  test("Empty state renders when impossible budget is selected", async ({ page }) => {
+    await page.goto(`http://127.0.0.1:${STOREFRONT_PORT}/en`);
+
+    const budgetChip = page.locator('button[data-ibj-budget="50000"]');
+    if (await budgetChip.count() > 0) {
+      await budgetChip.click();
+    } else {
+      // Direct client invocation for impossible budget ($500)
+      await page.evaluate(async () => {
+        const anyWindow = window as any;
+        if (anyWindow.__ibjClient) {
+          await anyWindow.__ibjClient.apply({
+            requestId: "req_empty_test",
+            sessionToken: "sess_demo",
+            locale: "en",
+            page: { kind: "collection", categoryId: "laptops" },
+            allowedSlots: ["collection_top"],
+            preferences: { maxBudgetMinor: 50000 },
+          }, document);
+        }
+      });
+    }
+
+    // Verify empty state is displayed
+    const emptyState = page.locator("#collection_top .ibj-empty-state");
+    await expect(emptyState).toBeVisible();
+    await expect(emptyState).toContainText("No laptops found");
+
+    // Clicking reset button inside empty state restores baseline
+    const emptyReset = emptyState.locator('button[data-ibj-action="reset"]');
+    await expect(emptyReset).toBeVisible();
+    await emptyReset.click();
+
+    await expect(page.locator("#collection_top .ibj-empty-state")).not.toBeVisible();
+    await expect(page.locator("#collection_top .ibj-intent-picker")).toBeVisible();
+
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-en-empty-state.png") });
+  });
+
+  test("Responsive layout at 375px mobile viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto(`http://127.0.0.1:${STOREFRONT_PORT}/en`);
+
+    const portableChip = page.locator('button[data-ibj-intent="portable_work"]');
+    await portableChip.click();
+
+    const productStrip = page.locator("#collection_top .ibj-product-strip");
+    await expect(productStrip).toBeVisible();
+
+    // Verify no horizontal overflow on body
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 2); // 2px margin for subpixel
+
+    const a11y = await new AxeBuilder({ page }).analyze();
+    expect(a11y.violations).toEqual([]);
+
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, "storefront-mobile-375-adapted.png") });
+  });
+});

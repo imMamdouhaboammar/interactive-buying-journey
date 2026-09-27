@@ -8,15 +8,19 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/connector/mock"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest"
+	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/secret"
 )
 
 func main() {
 	tenant := flag.String("tenant", "demo_store", "Tenant identifier")
-	secret := flag.String("secret", "test_secret_123", "Tenant HMAC secret")
+	secretFlag := flag.String("secret", "", "Tenant HMAC secret (prefer --secret-ref or --secret-file)")
+	secretRef := flag.String("secret-ref", "IBJ_HMAC_SECRET", "Environment variable name containing HMAC secret")
+	secretFile := flag.String("secret-file", "", "Path to file containing HMAC secret")
 	endpoint := flag.String("endpoint", "http://localhost:8080/catalog/batches", "Target API endpoint")
 	file := flag.String("file", "", "Path to batch JSON file")
 	generate := flag.Bool("generate", false, "Generate synthetic batch instead of reading file")
@@ -49,8 +53,34 @@ func main() {
 		}
 	}
 
+	var secretVal string
+	if *secretFlag != "" {
+		secretVal = *secretFlag
+	} else if *secretFile != "" {
+		dir := filepath.Dir(*secretFile)
+		base := filepath.Base(*secretFile)
+		provider := secret.NewFileSecretProvider(dir)
+		s, err := provider.GetSecret(context.Background(), base)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error resolving secret from file %s: %v\n", *secretFile, err)
+			os.Exit(1)
+		}
+		secretVal = s
+	} else if *secretRef != "" {
+		provider := secret.NewEnvSecretProvider("")
+		s, err := provider.GetSecret(context.Background(), *secretRef)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error resolving secret from env $%s: %v\n", *secretRef, err)
+			os.Exit(1)
+		}
+		secretVal = s
+	} else {
+		fmt.Fprintf(os.Stderr, "Error: no secret provided. Use --secret, --secret-ref, or --secret-file\n")
+		os.Exit(1)
+	}
+
 	now := time.Now().Unix()
-	sig := ingest.SignPayload(*secret, now, payload)
+	sig := ingest.SignPayload(secretVal, now, payload)
 
 	if *dryRun {
 		fmt.Printf("--- Dry Run ---\n")
@@ -63,7 +93,7 @@ func main() {
 		return
 	}
 
-	dispatcher := mock.NewDispatcher(*endpoint, *tenant, *secret, nil)
+	dispatcher := mock.NewDispatcher(*endpoint, *tenant, secretVal, nil)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 

@@ -41,8 +41,8 @@ func setupPostgresCatalogTest(t *testing.T) (*postgres.DB, *catalog.PostgresCata
 	tenantID := fmt.Sprintf("tenant_cat_%d", time.Now().UnixNano())
 	// Tenant with 3600 seconds (1 hour) max staleness
 	_, err = db.Pool().Exec(context.Background(), `
-		INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
-		VALUES ($1, 'Catalog Tenant', 'secret_cat', 3600)
+		INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+		VALUES ($1, 'Catalog Tenant', 'ref_cat', 3600)
 		ON CONFLICT (tenant_id) DO NOTHING
 	`, tenantID)
 	if err != nil {
@@ -159,11 +159,43 @@ func TestPostgresCatalog_EligibilityAndSearch(t *testing.T) {
 				FALSE
 			)
 		`, tenantID)
+		if err != nil {
+			return err
+		}
+
+		// 6. Out-of-stock laptop (violates FR-005 if surfaced)
+		_, err = tx.Exec(ctx, `
+			INSERT INTO variants (
+				tenant_id, variant_id, product_id, sku, title, title_norm, category, brand,
+				published, currency, price_minor, inventory_status, source_updated_at, last_verified_at,
+				is_tombstoned
+			) VALUES (
+				$1, 'lap_outofstock', 'prod_oos', 'SKU-OOS', 'Out of Stock Laptop', 'Out of Stock Laptop', 'laptops', 'BrandA',
+				TRUE, 'USD', 95000, 'out_of_stock', NOW(), NOW(),
+				FALSE
+			)
+		`, tenantID)
 		return err
 	})
 	if err != nil {
 		t.Fatalf("failed seeding variants: %v", err)
 	}
+
+	t.Run("TC-DEBT-01: Out-of-stock variant is excluded from search", func(t *testing.T) {
+		res, err := cat.Search(ctx, tenantID, catalog.SearchQuery{
+			Category: "laptops",
+			Currency: "USD",
+		})
+		if err != nil {
+			t.Fatalf("Search failed: %v", err)
+		}
+
+		for _, v := range res.Variants {
+			if v.ID == "lap_outofstock" || v.InventoryStatus == "out_of_stock" {
+				t.Fatalf("TC-DEBT-01 violated: out-of-stock variant %s was returned in search results!", v.ID)
+			}
+		}
+	})
 
 	t.Run("TC-COMP-01: GetActiveVersion returns active catalog version", func(t *testing.T) {
 		ver, err := cat.GetActiveVersion(ctx, tenantID)
@@ -295,3 +327,134 @@ func TestPostgresCatalog_EligibilityAndSearch(t *testing.T) {
 		}
 	})
 }
+
+type fakeClock struct {
+	now time.Time
+}
+
+func (f fakeClock) Now() time.Time {
+	return f.now
+}
+
+func TestPostgresCatalog_Debts_StalenessAndClock(t *testing.T) {
+	dsn := os.Getenv("IBJ_TEST_DATABASE_URL")
+	if dsn == "" {
+		dsn = "postgres://localhost:5432/postgres?sslmode=disable"
+	}
+	ctx := context.Background()
+	db, err := postgres.New(ctx, dsn)
+	if err != nil {
+		if os.Getenv("IBJ_REQUIRE_DB") == "1" {
+			t.Fatalf("failed to connect to postgres: %v", err)
+		}
+		t.Skipf("skipping (no db): %v", err)
+	}
+	defer db.Close()
+
+	if err := postgres.RunMigrations(dsn); err != nil {
+		t.Fatalf("failed to run migrations: %v", err)
+	}
+
+	t.Run("TC-DEBT-02: Tenant without max_staleness_seconds configured makes all variants ineligible", func(t *testing.T) {
+		tenantID := fmt.Sprintf("tenant_nostale_%d", time.Now().UnixNano())
+		// Tenant with NULL max_staleness_seconds
+		_, err := db.Pool().Exec(ctx, `
+			INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+			VALUES ($1, 'No Staleness Tenant', 'ref_nostale', NULL)
+		`, tenantID)
+		if err != nil {
+			t.Fatalf("failed creating tenant with NULL staleness: %v", err)
+		}
+		defer func() {
+			_, _ = db.Pool().Exec(ctx, "DELETE FROM variants WHERE tenant_id = $1", tenantID)
+			_, _ = db.Pool().Exec(ctx, "DELETE FROM tenants WHERE tenant_id = $1", tenantID)
+		}()
+
+		// Insert a variant verified recently
+		err = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
+			_, err := tx.Exec(ctx, `
+				INSERT INTO variants (
+					tenant_id, variant_id, product_id, sku, title, title_norm, category, brand,
+					published, currency, price_minor, inventory_status, source_updated_at, last_verified_at,
+					is_tombstoned
+				) VALUES (
+					$1, 'lap_fresh_nostale', 'prod_ns', 'SKU-NS', 'Fresh Laptop No Staleness', 'Fresh Laptop No Staleness', 'laptops', 'BrandA',
+					TRUE, 'USD', 120000, 'in_stock', NOW(), NOW(),
+					FALSE
+				)
+			`, tenantID)
+			return err
+		})
+		if err != nil {
+			t.Fatalf("failed inserting variant: %v", err)
+		}
+
+		cat := catalog.NewPostgresCatalog(db)
+		res, err := cat.Search(ctx, tenantID, catalog.SearchQuery{Category: "laptops", Currency: "USD"})
+		if err != nil {
+			t.Fatalf("Search failed: %v", err)
+		}
+		if len(res.Variants) != 0 {
+			t.Fatalf("TC-DEBT-02 violated: expected 0 variants for tenant with unconfigured max_staleness_seconds, got %d (silently defaulted)", len(res.Variants))
+		}
+	})
+
+	t.Run("TC-DEBT-03: Staleness uses injected Clock rather than database NOW()", func(t *testing.T) {
+		tenantID := fmt.Sprintf("tenant_clock_%d", time.Now().UnixNano())
+		// Tenant with 3600 seconds staleness
+		_, err := db.Pool().Exec(ctx, `
+			INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+			VALUES ($1, 'Clock Tenant', 'ref_clock', 3600)
+		`, tenantID)
+		if err != nil {
+			t.Fatalf("failed creating tenant: %v", err)
+		}
+		defer func() {
+			_, _ = db.Pool().Exec(ctx, "DELETE FROM variants WHERE tenant_id = $1", tenantID)
+			_, _ = db.Pool().Exec(ctx, "DELETE FROM tenants WHERE tenant_id = $1", tenantID)
+		}()
+
+		t0 := time.Date(2026, 9, 27, 10, 0, 0, 0, time.UTC)
+		// Insert variant with last_verified_at = t0
+		err = db.WithTenantTx(ctx, tenantID, func(tx pgx.Tx) error {
+			_, err := tx.Exec(ctx, `
+				INSERT INTO variants (
+					tenant_id, variant_id, product_id, sku, title, title_norm, category, brand,
+					published, currency, price_minor, inventory_status, source_updated_at, last_verified_at,
+					is_tombstoned
+				) VALUES (
+					$1, 'lap_clock_test', 'prod_ck', 'SKU-CK', 'Clock Test Laptop', 'Clock Test Laptop', 'laptops', 'BrandA',
+					TRUE, 'USD', 120000, 'in_stock', $2, $2,
+					FALSE
+				)
+			`, tenantID, t0)
+			return err
+		})
+		if err != nil {
+			t.Fatalf("failed inserting variant: %v", err)
+		}
+
+		// As of t0 + 1800s (30m): should be fresh (<= 3600s)
+		freshClock := fakeClock{now: t0.Add(1800 * time.Second)}
+		catFresh := catalog.NewPostgresCatalogWithClock(db, freshClock)
+		resFresh, err := catFresh.Search(ctx, tenantID, catalog.SearchQuery{Category: "laptops", Currency: "USD"})
+		if err != nil {
+			t.Fatalf("Search failed: %v", err)
+		}
+		if len(resFresh.Variants) != 1 {
+			t.Fatalf("TC-DEBT-03 violated: expected 1 fresh variant as of injected clock, got %d", len(resFresh.Variants))
+		}
+
+		// As of t0 + 3601s: should be stale (> 3600s)
+		staleClock := fakeClock{now: t0.Add(3601 * time.Second)}
+		catStale := catalog.NewPostgresCatalogWithClock(db, staleClock)
+		resStale, err := catStale.Search(ctx, tenantID, catalog.SearchQuery{Category: "laptops", Currency: "USD"})
+		if err != nil {
+			t.Fatalf("Search failed: %v", err)
+		}
+		if len(resStale.Variants) != 0 {
+			t.Fatalf("TC-DEBT-03 violated: expected 0 variants when stale as of injected clock, got %d", len(resStale.Variants))
+		}
+	})
+}
+

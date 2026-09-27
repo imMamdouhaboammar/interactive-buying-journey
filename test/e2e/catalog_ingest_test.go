@@ -26,6 +26,7 @@ import (
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/httpapi"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/policy"
+	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/secret"
 	"github.com/imMamdouhaboammar/interactive-buying-journey/internal/storage/postgres"
 )
 
@@ -57,16 +58,21 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	tenantB := "demo_store_b"
 	secretB := "test_secret_b_456"
 
+	keyRefA := "REF_DEMO_STORE_A"
+	keyRefB := "REF_DEMO_STORE_B"
+	t.Setenv(keyRefA, secretA)
+	t.Setenv(keyRefB, secretB)
+
 	// Seed tenants
 	_, err = db.Pool().Exec(ctx, `
-		INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
+		INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
 		VALUES 
 			($1, 'Demo Store A', $2, 86400),
 			($3, 'Demo Store B', $4, 86400)
 		ON CONFLICT (tenant_id) DO UPDATE SET 
-			secret_current = EXCLUDED.secret_current,
+			secret_key_ref = EXCLUDED.secret_key_ref,
 			max_staleness_seconds = EXCLUDED.max_staleness_seconds
-	`, tenantA, secretA, tenantB, secretB)
+	`, tenantA, keyRefA, tenantB, keyRefB)
 	if err != nil {
 		t.Fatalf("failed to seed tenants: %v", err)
 	}
@@ -100,14 +106,18 @@ func TestE2E_CatalogIngest_Lifecycle(t *testing.T) {
 	composer := compose.NewComposer(cat, pol, val)
 	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 
+	secProvider := secret.NewEnvSecretProvider("")
 	secretLookup := func(ctx context.Context, tID string) (string, string, error) {
-		if tID == tenantA {
-			return secretA, "", nil
+		var keyRef string
+		err := db.Pool().QueryRow(ctx, "SELECT secret_key_ref FROM tenants WHERE tenant_id = $1", tID).Scan(&keyRef)
+		if err != nil {
+			return "", "", fmt.Errorf("unknown tenant: %s", tID)
 		}
-		if tID == tenantB {
-			return secretB, "", nil
+		sec, err := secProvider.GetSecret(ctx, keyRef)
+		if err != nil {
+			return "", "", err
 		}
-		return "", "", fmt.Errorf("unknown tenant: %s", tID)
+		return sec, "", nil
 	}
 
 	handler := httpapi.NewHandler(composer, val, logger, httpapi.WithIngest(svc, secretLookup, nil))

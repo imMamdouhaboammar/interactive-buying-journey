@@ -45,14 +45,14 @@ func TestBenchmark_10kVariants(t *testing.T) {
 	}
 
 	tenantID := "tenant_bench_10k"
-	secret := "secret_bench_10k"
+	keyRef := "ref_bench_10k"
 
 	// Seed tenant
 	_, err = db.Pool().Exec(ctx, `
-		INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
+		INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
 		VALUES ($1, 'Benchmark Tenant', $2, 86400)
-		ON CONFLICT (tenant_id) DO UPDATE SET secret_current = EXCLUDED.secret_current
-	`, tenantID, secret)
+		ON CONFLICT (tenant_id) DO UPDATE SET secret_key_ref = EXCLUDED.secret_key_ref
+	`, tenantID, keyRef)
 	if err != nil {
 		t.Fatalf("failed to seed tenant: %v", err)
 	}

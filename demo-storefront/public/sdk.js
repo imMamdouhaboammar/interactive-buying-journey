@@ -32,7 +32,7 @@ var __toESM = (mod, isNodeMode, target) => {
 };
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/codegen/code.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/codegen/code.js
 var require_code = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.regexpCode = exports.getEsmExportName = exports.getProperty = exports.safeStringify = exports.stringify = exports.strConcat = exports.addCodeArg = exports.str = exports._ = exports.nil = exports._Code = exports.Name = exports.IDENTIFIER = exports._CodeOrName = undefined;
@@ -186,7 +186,7 @@ var require_code = __commonJS(function(exports) {
   exports.regexpCode = regexpCode;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/codegen/scope.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/codegen/scope.js
 var require_scope = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = undefined;
@@ -332,7 +332,7 @@ var require_scope = __commonJS(function(exports) {
   exports.ValueScope = ValueScope;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/codegen/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/codegen/index.js
 var require_codegen = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.or = exports.and = exports.not = exports.CodeGen = exports.operators = exports.varKinds = exports.ValueScopeName = exports.ValueScope = exports.Scope = exports.Name = exports.regexpCode = exports.stringify = exports.getProperty = exports.nil = exports.strConcat = exports.str = exports._ = undefined;
@@ -1042,7 +1042,7 @@ var require_codegen = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/util.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/util.js
 var require_util = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.checkStrictMode = exports.getErrorPath = exports.Type = exports.useFunc = exports.setEvaluated = exports.evaluatedPropsToName = exports.mergeEvaluated = exports.eachItem = exports.unescapeJsonPointer = exports.escapeJsonPointer = exports.escapeFragment = exports.unescapeFragment = exports.schemaRefOrVal = exports.schemaHasRulesButRef = exports.schemaHasRules = exports.checkUnknownRules = exports.alwaysValidSchema = exports.toHash = undefined;
@@ -1206,7 +1206,7 @@ var require_util = __commonJS(function(exports) {
   exports.checkStrictMode = checkStrictMode;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/names.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/names.js
 var require_names = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -1231,7 +1231,7 @@ var require_names = __commonJS(function(exports) {
   exports.default = names;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/errors.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/errors.js
 var require_errors = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.extendErrors = exports.resetErrorsCount = exports.reportExtraError = exports.reportError = exports.keyword$DataError = exports.keywordError = undefined;
@@ -1349,7 +1349,7 @@ var require_errors = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/boolSchema.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/boolSchema.js
 var require_boolSchema = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.boolOrEmptySchema = exports.topBoolOrEmptySchema = undefined;
@@ -1397,7 +1397,7 @@ var require_boolSchema = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/rules.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/rules.js
 var require_rules = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.getRules = exports.isJSONType = undefined;
@@ -1425,7 +1425,7 @@ var require_rules = __commonJS(function(exports) {
   exports.getRules = getRules;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/applicability.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/applicability.js
 var require_applicability = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.shouldUseRule = exports.shouldUseGroup = exports.schemaHasRulesForType = undefined;
@@ -1445,7 +1445,7 @@ var require_applicability = __commonJS(function(exports) {
   exports.shouldUseRule = shouldUseRule;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/dataType.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/dataType.js
 var require_dataType = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.reportTypeError = exports.checkDataTypes = exports.checkDataType = exports.coerceAndCheckDataType = exports.getJSONTypes = exports.getSchemaTypes = exports.DataType = undefined;
@@ -1626,7 +1626,7 @@ var require_dataType = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/defaults.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/defaults.js
 var require_defaults = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.assignDefaults = undefined;
@@ -1660,7 +1660,7 @@ var require_defaults = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/code.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/code.js
 var require_code2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateUnion = exports.validateArray = exports.usePattern = exports.callValidateCode = exports.schemaProperties = exports.allSchemaProperties = exports.noPropertyInData = exports.propertyInData = exports.isOwnProperty = exports.hasPropFunc = exports.reportMissingProp = exports.checkMissingProp = exports.checkReportMissingProp = undefined;
@@ -1789,7 +1789,7 @@ var require_code2 = __commonJS(function(exports) {
   exports.validateUnion = validateUnion;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/keyword.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/keyword.js
 var require_keyword = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateKeywordUsage = exports.validSchemaType = exports.funcKeywordCode = exports.macroKeywordCode = undefined;
@@ -1904,7 +1904,7 @@ var require_keyword = __commonJS(function(exports) {
   exports.validateKeywordUsage = validateKeywordUsage;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/subschema.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/subschema.js
 var require_subschema = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = undefined;
@@ -1984,7 +1984,7 @@ var require_subschema = __commonJS(function(exports) {
   exports.extendSubschemaMode = extendSubschemaMode;
 });
 
-// ../../.bun/install/cache/links/fast-deep-equal@3.1.3-d01a284ad2ba9de2/node_modules/fast-deep-equal/index.js
+// ../../../.bun/install/cache/links/fast-deep-equal@3.1.3-d01a284ad2ba9de2/node_modules/fast-deep-equal/index.js
 var require_fast_deep_equal = __commonJS(function(exports, module) {
   module.exports = function equal(a, b) {
     if (a === b)
@@ -2026,7 +2026,7 @@ var require_fast_deep_equal = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/json-schema-traverse@1.0.0-fa1c1bd2992447fe/node_modules/json-schema-traverse/index.js
+// ../../../.bun/install/cache/links/json-schema-traverse@1.0.0-fa1c1bd2992447fe/node_modules/json-schema-traverse/index.js
 var require_json_schema_traverse = __commonJS(function(exports, module) {
   var traverse = module.exports = function(schema, opts, cb) {
     if (typeof opts == "function") {
@@ -2109,7 +2109,7 @@ var require_json_schema_traverse = __commonJS(function(exports, module) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/resolve.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/resolve.js
 var require_resolve = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.getSchemaRefs = exports.resolveUrl = exports.normalizeId = exports._getFullPath = exports.getFullPath = exports.inlineRef = undefined;
@@ -2262,7 +2262,7 @@ var require_resolve = __commonJS(function(exports) {
   exports.getSchemaRefs = getSchemaRefs;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/validate/index.js
 var require_validate = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.getData = exports.KeywordCxt = exports.validateFunctionCode = undefined;
@@ -2767,7 +2767,7 @@ var require_validate = __commonJS(function(exports) {
   exports.getData = getData;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/validation_error.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/validation_error.js
 var require_validation_error = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -2781,7 +2781,7 @@ var require_validation_error = __commonJS(function(exports) {
   exports.default = ValidationError;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/ref_error.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/ref_error.js
 var require_ref_error = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var resolve_1 = require_resolve();
@@ -2796,7 +2796,7 @@ var require_ref_error = __commonJS(function(exports) {
   exports.default = MissingRefError;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/compile/index.js
 var require_compile = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.resolveSchema = exports.getCompilingSchema = exports.resolveRef = exports.compileSchema = exports.SchemaEnv = undefined;
@@ -3017,7 +3017,7 @@ var require_compile = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/data.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/data.json
 var require_data = __commonJS(function(exports, module) {
   module.exports = {
     $id: "https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#",
@@ -3034,7 +3034,7 @@ var require_data = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/fast-uri@3.1.8-c511e5e1a078030c/node_modules/fast-uri/lib/utils.js
+// ../../../.bun/install/cache/links/fast-uri@3.1.8-c511e5e1a078030c/node_modules/fast-uri/lib/utils.js
 var require_utils = __commonJS(function(exports, module) {
   var isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
   var isIPv4 = RegExp.prototype.test.bind(/^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u);
@@ -3551,7 +3551,7 @@ var require_utils = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/fast-uri@3.1.8-c511e5e1a078030c/node_modules/fast-uri/lib/schemes.js
+// ../../../.bun/install/cache/links/fast-uri@3.1.8-c511e5e1a078030c/node_modules/fast-uri/lib/schemes.js
 var require_schemes = __commonJS(function(exports, module) {
   var { isUUID } = require_utils();
   var URN_REG = /^([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-./:;=@]|%[\da-f]{2})+)$/iu;
@@ -3726,7 +3726,7 @@ var require_schemes = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/fast-uri@3.1.8-c511e5e1a078030c/node_modules/fast-uri/index.js
+// ../../../.bun/install/cache/links/fast-uri@3.1.8-c511e5e1a078030c/node_modules/fast-uri/index.js
 var require_fast_uri = __commonJS(function(exports, module) {
   var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, serializePathEncoding, normalizeQueryFragmentEncoding, encodeQuery, encodeFragment, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils();
   var { SCHEMES, getSchemeHandler } = require_schemes();
@@ -4129,7 +4129,7 @@ var require_fast_uri = __commonJS(function(exports, module) {
   module.exports.fastUri = fastUri;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/uri.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/uri.js
 var require_uri = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var uri = require_fast_uri();
@@ -4137,7 +4137,7 @@ var require_uri = __commonJS(function(exports) {
   exports.default = uri;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/core.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/core.js
 var require_core = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = undefined;
@@ -4730,7 +4730,7 @@ var require_core = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/core/id.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/core/id.js
 var require_id = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var def = {
@@ -4742,7 +4742,7 @@ var require_id = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/core/ref.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/core/ref.js
 var require_ref = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.callRef = exports.getValidate = undefined;
@@ -4861,7 +4861,7 @@ var require_ref = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/core/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/core/index.js
 var require_core2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var id_1 = require_id();
@@ -4879,7 +4879,7 @@ var require_core2 = __commonJS(function(exports) {
   exports.default = core;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitNumber.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitNumber.js
 var require_limitNumber = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -4908,7 +4908,7 @@ var require_limitNumber = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/multipleOf.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/multipleOf.js
 var require_multipleOf = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -4933,7 +4933,7 @@ var require_multipleOf = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/ucs2length.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/ucs2length.js
 var require_ucs2length = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   function ucs2length(str) {
@@ -4956,7 +4956,7 @@ var require_ucs2length = __commonJS(function(exports) {
   ucs2length.code = 'require("ajv/dist/runtime/ucs2length").default';
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitLength.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitLength.js
 var require_limitLength = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -4985,7 +4985,7 @@ var require_limitLength = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/pattern.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/pattern.js
 var require_pattern = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var code_1 = require_code2();
@@ -5019,7 +5019,7 @@ var require_pattern = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitProperties.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitProperties.js
 var require_limitProperties = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5045,7 +5045,7 @@ var require_limitProperties = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/required.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/required.js
 var require_required = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var code_1 = require_code2();
@@ -5124,7 +5124,7 @@ var require_required = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitItems.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitItems.js
 var require_limitItems = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5150,7 +5150,7 @@ var require_limitItems = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/equal.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/runtime/equal.js
 var require_equal = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var equal = require_fast_deep_equal();
@@ -5158,7 +5158,7 @@ var require_equal = __commonJS(function(exports) {
   exports.default = equal;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/uniqueItems.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/uniqueItems.js
 var require_uniqueItems = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dataType_1 = require_dataType();
@@ -5222,7 +5222,7 @@ var require_uniqueItems = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/const.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/const.js
 var require_const = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5248,7 +5248,7 @@ var require_const = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/enum.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/enum.js
 var require_enum = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5294,7 +5294,7 @@ var require_enum = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/index.js
 var require_validation = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var limitNumber_1 = require_limitNumber();
@@ -5324,7 +5324,7 @@ var require_validation = __commonJS(function(exports) {
   exports.default = validation;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/additionalItems.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/additionalItems.js
 var require_additionalItems = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateAdditionalItems = undefined;
@@ -5374,7 +5374,7 @@ var require_additionalItems = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/items.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/items.js
 var require_items = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateTuple = undefined;
@@ -5428,7 +5428,7 @@ var require_items = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/prefixItems.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/prefixItems.js
 var require_prefixItems = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var items_1 = require_items();
@@ -5442,7 +5442,7 @@ var require_prefixItems = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/items2020.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/items2020.js
 var require_items2020 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5474,7 +5474,7 @@ var require_items2020 = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/contains.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/contains.js
 var require_contains = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5565,7 +5565,7 @@ var require_contains = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/dependencies.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/dependencies.js
 var require_dependencies = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateSchemaDeps = exports.validatePropertyDeps = exports.error = undefined;
@@ -5650,7 +5650,7 @@ var require_dependencies = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/propertyNames.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/propertyNames.js
 var require_propertyNames = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -5690,7 +5690,7 @@ var require_propertyNames = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js
 var require_additionalProperties = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var code_1 = require_code2();
@@ -5793,7 +5793,7 @@ var require_additionalProperties = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/properties.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/properties.js
 var require_properties = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var validate_1 = require_validate();
@@ -5848,7 +5848,7 @@ var require_properties = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/patternProperties.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/patternProperties.js
 var require_patternProperties = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var code_1 = require_code2();
@@ -5919,7 +5919,7 @@ var require_patternProperties = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/not.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/not.js
 var require_not = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var util_1 = require_util();
@@ -5947,7 +5947,7 @@ var require_not = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/anyOf.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/anyOf.js
 var require_anyOf = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var code_1 = require_code2();
@@ -5961,7 +5961,7 @@ var require_anyOf = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/oneOf.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/oneOf.js
 var require_oneOf = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -6016,7 +6016,7 @@ var require_oneOf = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/allOf.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/allOf.js
 var require_allOf = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var util_1 = require_util();
@@ -6040,7 +6040,7 @@ var require_allOf = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/if.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/if.js
 var require_if = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -6106,7 +6106,7 @@ var require_if = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/thenElse.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/thenElse.js
 var require_thenElse = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var util_1 = require_util();
@@ -6121,7 +6121,7 @@ var require_thenElse = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/index.js
 var require_applicator = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var additionalItems_1 = require_additionalItems();
@@ -6164,7 +6164,7 @@ var require_applicator = __commonJS(function(exports) {
   exports.default = getApplicator;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/dynamicAnchor.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/dynamicAnchor.js
 var require_dynamicAnchor = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.dynamicAnchor = undefined;
@@ -6196,7 +6196,7 @@ var require_dynamicAnchor = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/dynamicRef.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/dynamicRef.js
 var require_dynamicRef = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.dynamicRef = undefined;
@@ -6239,7 +6239,7 @@ var require_dynamicRef = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/recursiveAnchor.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/recursiveAnchor.js
 var require_recursiveAnchor = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dynamicAnchor_1 = require_dynamicAnchor();
@@ -6257,7 +6257,7 @@ var require_recursiveAnchor = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/recursiveRef.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/recursiveRef.js
 var require_recursiveRef = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dynamicRef_1 = require_dynamicRef();
@@ -6269,7 +6269,7 @@ var require_recursiveRef = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/dynamic/index.js
 var require_dynamic = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dynamicAnchor_1 = require_dynamicAnchor();
@@ -6280,7 +6280,7 @@ var require_dynamic = __commonJS(function(exports) {
   exports.default = dynamic;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/dependentRequired.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/dependentRequired.js
 var require_dependentRequired = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dependencies_1 = require_dependencies();
@@ -6294,7 +6294,7 @@ var require_dependentRequired = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/dependentSchemas.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/applicator/dependentSchemas.js
 var require_dependentSchemas = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dependencies_1 = require_dependencies();
@@ -6307,7 +6307,7 @@ var require_dependentSchemas = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitContains.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/validation/limitContains.js
 var require_limitContains = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var util_1 = require_util();
@@ -6324,7 +6324,7 @@ var require_limitContains = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/next.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/next.js
 var require_next = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var dependentRequired_1 = require_dependentRequired();
@@ -6334,7 +6334,7 @@ var require_next = __commonJS(function(exports) {
   exports.default = next;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedProperties.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedProperties.js
 var require_unevaluatedProperties = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -6397,7 +6397,7 @@ var require_unevaluatedProperties = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedItems.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedItems.js
 var require_unevaluatedItems = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -6438,7 +6438,7 @@ var require_unevaluatedItems = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/unevaluated/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/unevaluated/index.js
 var require_unevaluated = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var unevaluatedProperties_1 = require_unevaluatedProperties();
@@ -6447,7 +6447,7 @@ var require_unevaluated = __commonJS(function(exports) {
   exports.default = unevaluated;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/format/format.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/format/format.js
 var require_format = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -6534,7 +6534,7 @@ var require_format = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/format/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/format/index.js
 var require_format2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var format_1 = require_format();
@@ -6542,7 +6542,7 @@ var require_format2 = __commonJS(function(exports) {
   exports.default = format;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/metadata.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/metadata.js
 var require_metadata = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.contentVocabulary = exports.metadataVocabulary = undefined;
@@ -6562,7 +6562,7 @@ var require_metadata = __commonJS(function(exports) {
   ];
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/draft2020.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/draft2020.js
 var require_draft2020 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var core_1 = require_core2();
@@ -6587,7 +6587,7 @@ var require_draft2020 = __commonJS(function(exports) {
   exports.default = draft2020Vocabularies;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/discriminator/types.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/discriminator/types.js
 var require_types = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiscrError = undefined;
@@ -6598,7 +6598,7 @@ var require_types = __commonJS(function(exports) {
   })(DiscrError || (exports.DiscrError = DiscrError = {}));
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/discriminator/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/discriminator/index.js
 var require_discriminator = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var codegen_1 = require_codegen();
@@ -6700,7 +6700,7 @@ var require_discriminator = __commonJS(function(exports) {
   exports.default = def;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/schema.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/schema.json
 var require_schema = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6758,7 +6758,7 @@ var require_schema = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/applicator.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/applicator.json
 var require_applicator2 = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6809,7 +6809,7 @@ var require_applicator2 = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/unevaluated.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/unevaluated.json
 var require_unevaluated2 = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6827,7 +6827,7 @@ var require_unevaluated2 = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/content.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/content.json
 var require_content = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6846,7 +6846,7 @@ var require_content = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/core.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/core.json
 var require_core3 = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6900,7 +6900,7 @@ var require_core3 = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/format-annotation.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/format-annotation.json
 var require_format_annotation = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6917,7 +6917,7 @@ var require_format_annotation = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/meta-data.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/meta-data.json
 var require_meta_data = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -6956,7 +6956,7 @@ var require_meta_data = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/validation.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/meta/validation.json
 var require_validation2 = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -7049,7 +7049,7 @@ var require_validation2 = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/index.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-2020-12/index.js
 var require_json_schema_2020_12 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var metaSchema = require_schema();
@@ -7080,7 +7080,7 @@ var require_json_schema_2020_12 = __commonJS(function(exports) {
   exports.default = addMetaSchema2020;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/2020.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/2020.js
 var require__2020 = __commonJS(function(exports, module) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv2020 = undefined;
@@ -7155,7 +7155,7 @@ var require__2020 = __commonJS(function(exports, module) {
   } });
 });
 
-// ../../.bun/install/cache/links/ajv-formats@3.0.1-15bc7f3ee0c8e190/node_modules/ajv-formats/dist/formats.js
+// ../../../.bun/install/cache/links/ajv-formats@3.0.1-15bc7f3ee0c8e190/node_modules/ajv-formats/dist/formats.js
 var require_formats = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.formatNames = exports.fastFormats = exports.fullFormats = undefined;
@@ -7332,7 +7332,7 @@ var require_formats = __commonJS(function(exports) {
   }
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/draft7.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/vocabularies/draft7.js
 var require_draft7 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var core_1 = require_core2();
@@ -7351,7 +7351,7 @@ var require_draft7 = __commonJS(function(exports) {
   exports.default = draft7Vocabularies;
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-draft-07.json
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/refs/json-schema-draft-07.json
 var require_json_schema_draft_07 = __commonJS(function(exports, module) {
   module.exports = {
     $schema: "http://json-schema.org/draft-07/schema#",
@@ -7506,7 +7506,7 @@ var require_json_schema_draft_07 = __commonJS(function(exports, module) {
   };
 });
 
-// ../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/ajv.js
+// ../../../.bun/install/cache/links/ajv@8.20.0-85597e7983879c6d/node_modules/ajv/dist/ajv.js
 var require_ajv = __commonJS(function(exports, module) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv = undefined;
@@ -7574,7 +7574,7 @@ var require_ajv = __commonJS(function(exports, module) {
   } });
 });
 
-// ../../.bun/install/cache/links/ajv-formats@3.0.1-15bc7f3ee0c8e190/node_modules/ajv-formats/dist/limit.js
+// ../../../.bun/install/cache/links/ajv-formats@3.0.1-15bc7f3ee0c8e190/node_modules/ajv-formats/dist/limit.js
 var require_limit = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.formatLimitDefinition = undefined;
@@ -7643,7 +7643,7 @@ var require_limit = __commonJS(function(exports) {
   exports.default = formatLimitPlugin;
 });
 
-// ../../.bun/install/cache/links/ajv-formats@3.0.1-15bc7f3ee0c8e190/node_modules/ajv-formats/dist/index.js
+// ../../../.bun/install/cache/links/ajv-formats@3.0.1-15bc7f3ee0c8e190/node_modules/ajv-formats/dist/index.js
 var require_dist = __commonJS(function(exports, module) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var formats_1 = require_formats();
@@ -7998,20 +7998,280 @@ function validateExperiencePlan(data) {
   return { valid: true, plan };
 }
 // sdk/src/renderer.ts
-function renderExperiencePlan(plan, rootDoc = document) {
+function renderExperiencePlan(plan, rootDoc = document, callbacks) {
+  const activeIntent = rootDoc.activeElement?.getAttribute("data-ibj-intent");
+  const activeAction = rootDoc.activeElement?.getAttribute("data-ibj-action");
+  const activeBudget = rootDoc.activeElement?.getAttribute("data-ibj-budget");
   if (plan.status === "baseline" || plan.sections.length === 0) {
+    const slots = rootDoc.querySelectorAll("[data-ibj-slot], #collection_top");
+    for (const slotEl of Array.from(slots)) {
+      const baseline = slotEl.__ibjBaselineHTML;
+      if (baseline !== undefined) {
+        slotEl.innerHTML = baseline;
+        if (activeIntent) {
+          slotEl.querySelector(`[data-ibj-intent="${activeIntent}"]`)?.focus();
+        } else if (activeAction) {
+          slotEl.querySelector(`[data-ibj-action="${activeAction}"]`)?.focus();
+        } else if (activeBudget) {
+          slotEl.querySelector(`[data-ibj-budget="${activeBudget}"]`)?.focus();
+        }
+      }
+    }
     return;
   }
+  const slotSections = new Map;
   for (const section of plan.sections) {
-    const slotEl = rootDoc.querySelector(`[data-ibj-slot="${section.slot_id}"]`) || rootDoc.getElementById(section.slot_id);
+    const list = slotSections.get(section.slot_id) || [];
+    list.push(section);
+    slotSections.set(section.slot_id, list);
+  }
+  for (const [slotId, sections] of slotSections.entries()) {
+    const slotEl = rootDoc.querySelector(`[data-ibj-slot="${slotId}"]`) || rootDoc.getElementById(slotId);
     if (!slotEl) {
       continue;
     }
+    if (slotEl.__ibjBaselineHTML === undefined) {
+      slotEl.__ibjBaselineHTML = slotEl.innerHTML;
+    }
+    while (slotEl.firstChild) {
+      slotEl.removeChild(slotEl.firstChild);
+    }
+    const container = rootDoc.createElement("div");
+    container.className = "ibj-experience-container";
+    container.setAttribute("dir", plan.locale === "ar" ? "rtl" : "ltr");
+    container.setAttribute("lang", plan.locale);
+    for (const section of sections) {
+      if (section.kind === "intent-picker") {
+        const pickerEl = renderIntentPicker(section, plan.locale, rootDoc, callbacks);
+        container.appendChild(pickerEl);
+      } else if (section.kind === "product-strip") {
+        const stripEl = renderProductStrip(section, plan.locale, rootDoc);
+        container.appendChild(stripEl);
+      } else if (section.kind === "empty-state") {
+        const emptyEl = renderEmptyState(section, plan.locale, rootDoc, callbacks);
+        container.appendChild(emptyEl);
+      }
+    }
+    slotEl.appendChild(container);
+    if (activeIntent) {
+      const el = slotEl.querySelector(`[data-ibj-intent="${activeIntent}"]`);
+      el?.focus();
+    } else if (activeAction) {
+      const el = slotEl.querySelector(`[data-ibj-action="${activeAction}"]`);
+      el?.focus();
+    } else if (activeBudget) {
+      const el = slotEl.querySelector(`[data-ibj-budget="${activeBudget}"]`);
+      el?.focus();
+    }
+  }
+}
+function localizeLabelKey(key, locale) {
+  const isAr = locale === "ar";
+  switch (key) {
+    case "what_matters_most":
+      return isAr ? "ما الذي يهمك أكثر؟" : "What matters most?";
+    case "recommended_laptops":
+      return isAr ? "الحواسيب المقترحة" : "Recommended for You";
+    case "no_matching_laptops":
+      return isAr ? "لم يتم العثور على حواسيب مطابقة" : "No matching laptops found";
+    default:
+      return key || (isAr ? "ما الذي يهمك أكثر؟" : "What matters most?");
+  }
+}
+function localizeIntentOption(id, labelKey, locale) {
+  const isAr = locale === "ar";
+  switch (id) {
+    case "portable_work":
+      return isAr ? "عمل متنقل" : "Portable Work";
+    case "performance":
+      return isAr ? "أداء عالي" : "Performance";
+    case "everyday_value":
+      return isAr ? "استخدام يومي اقتصادي" : "Everyday Value";
+    case "not_sure":
+      return isAr ? "لست متأكداً" : "Not Sure";
+    default:
+      return labelKey || id;
+  }
+}
+function renderIntentPicker(section, locale, rootDoc, callbacks) {
+  const isAr = locale === "ar";
+  const wrapper = rootDoc.createElement("div");
+  wrapper.className = "ibj-intent-picker";
+  wrapper.setAttribute("role", "region");
+  wrapper.setAttribute("aria-label", isAr ? "اختيار تفضيلات الحاسوب" : "Laptop Preferences");
+  const header = rootDoc.createElement("div");
+  header.className = "ibj-intent-header";
+  const title = rootDoc.createElement("h2");
+  title.className = "ibj-intent-title";
+  const labelText = localizeLabelKey(section.config?.label_key, locale);
+  title.textContent = labelText;
+  header.appendChild(title);
+  wrapper.appendChild(header);
+  const chipList = rootDoc.createElement("div");
+  chipList.className = "ibj-chip-list";
+  chipList.setAttribute("role", "group");
+  chipList.setAttribute("aria-label", labelText);
+  const rawOptions = section.config?.options || [];
+  const options = rawOptions.length > 0 ? rawOptions : [
+    { id: "portable_work", label_key: isAr ? "عمل متنقل" : "Portable Work" },
+    { id: "performance", label_key: isAr ? "أداء عالي" : "Performance" },
+    { id: "everyday_value", label_key: isAr ? "استخدام يومي اقتصادي" : "Everyday Value" }
+  ];
+  for (const opt of options) {
+    const btn = rootDoc.createElement("button");
+    btn.type = "button";
+    btn.className = "ibj-chip";
+    btn.setAttribute("data-ibj-intent", opt.id);
+    const chipLabel = localizeIntentOption(opt.id, opt.label_key, locale);
+    btn.setAttribute("aria-label", chipLabel);
+    btn.textContent = chipLabel;
+    if (callbacks?.onSelectIntent) {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        callbacks.onSelectIntent(opt.id);
+      });
+    }
+    chipList.appendChild(btn);
+  }
+  wrapper.appendChild(chipList);
+  const budgetGroup = rootDoc.createElement("div");
+  budgetGroup.className = "ibj-budget-group";
+  const budgetTitle = rootDoc.createElement("span");
+  budgetTitle.className = "ibj-budget-label";
+  budgetTitle.textContent = isAr ? "الميزانية:" : "Budget:";
+  budgetGroup.appendChild(budgetTitle);
+  const budgetTiers = [
+    { label: isAr ? "حتى $500" : "Up to $500", minor: 50000 },
+    { label: isAr ? "حتى $1,000" : "Up to $1,000", minor: 1e5 },
+    { label: isAr ? "حتى $1,200" : "Up to $1,200", minor: 120000 },
+    { label: isAr ? "حتى $1,500" : "Up to $1,500", minor: 150000 }
+  ];
+  for (const b of budgetTiers) {
+    const bBtn = rootDoc.createElement("button");
+    bBtn.type = "button";
+    bBtn.className = "ibj-budget-chip";
+    bBtn.setAttribute("data-ibj-budget", String(b.minor));
+    bBtn.setAttribute("aria-label", b.label);
+    bBtn.textContent = b.label;
+    if (callbacks?.onSelectBudget) {
+      bBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        callbacks.onSelectBudget(b.minor);
+      });
+    }
+    budgetGroup.appendChild(bBtn);
+  }
+  const resetBtn = rootDoc.createElement("button");
+  resetBtn.type = "button";
+  resetBtn.className = "ibj-reset-button";
+  resetBtn.setAttribute("data-ibj-action", "reset");
+  resetBtn.setAttribute("aria-label", isAr ? "إعادة الضبط" : "Reset preferences");
+  resetBtn.textContent = isAr ? "إعادة الضبط" : "Reset";
+  if (callbacks?.onResetPreferences) {
+    resetBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      callbacks.onResetPreferences();
+    });
+  }
+  budgetGroup.appendChild(resetBtn);
+  wrapper.appendChild(budgetGroup);
+  return wrapper;
+}
+function renderProductStrip(section, locale, rootDoc) {
+  const isAr = locale === "ar";
+  const strip = rootDoc.createElement("section");
+  strip.className = "ibj-product-strip";
+  strip.setAttribute("role", "region");
+  strip.setAttribute("aria-label", isAr ? "الحواسيب المقترحة" : "Recommended Laptops");
+  const stripHeader = rootDoc.createElement("div");
+  stripHeader.className = "ibj-strip-header";
+  const stripTitle = rootDoc.createElement("h2");
+  stripTitle.className = "ibj-strip-title";
+  stripTitle.textContent = isAr ? "المقترحات المتطابقة مع اختياراتك" : "Recommended for You";
+  stripHeader.appendChild(stripTitle);
+  const badgeContainer = rootDoc.createElement("div");
+  badgeContainer.className = "ibj-badges";
+  for (const rc of section.reason_codes) {
+    const badge = rootDoc.createElement("span");
+    badge.className = "ibj-badge";
+    badge.textContent = localizeReasonCode(rc, locale);
+    badgeContainer.appendChild(badge);
+  }
+  stripHeader.appendChild(badgeContainer);
+  strip.appendChild(stripHeader);
+  const cardsContainer = rootDoc.createElement("div");
+  cardsContainer.className = "ibj-cards-container";
+  for (const item of section.items) {
+    const card = rootDoc.createElement("article");
+    card.className = "ibj-product-card";
+    card.setAttribute("data-variant-id", item.variant_id);
+    const merchantCard = rootDoc.querySelector(`[data-product-id="${item.variant_id}"], [data-variant-id="${item.variant_id}"]`);
+    const titleText = merchantCard?.querySelector("h2, h3")?.textContent || item.variant_id;
+    const priceText = merchantCard?.querySelector(".price")?.textContent || "";
+    const cardTitle = rootDoc.createElement("h3");
+    cardTitle.textContent = titleText;
+    card.appendChild(cardTitle);
+    if (priceText) {
+      const cardPrice = rootDoc.createElement("p");
+      cardPrice.className = "ibj-card-price";
+      cardPrice.textContent = priceText;
+      card.appendChild(cardPrice);
+    }
+    const badge = rootDoc.createElement("span");
+    badge.className = "ibj-match-tag";
+    badge.textContent = isAr ? "مطابق لاختيارك" : "Matched to your preferences";
+    card.appendChild(badge);
+    cardsContainer.appendChild(card);
+  }
+  strip.appendChild(cardsContainer);
+  return strip;
+}
+function renderEmptyState(_section, locale, rootDoc, callbacks) {
+  const isAr = locale === "ar";
+  const emptyContainer = rootDoc.createElement("div");
+  emptyContainer.className = "ibj-empty-state";
+  emptyContainer.setAttribute("role", "status");
+  emptyContainer.setAttribute("aria-live", "polite");
+  const msg = rootDoc.createElement("p");
+  msg.className = "ibj-empty-message";
+  msg.textContent = isAr ? "لم يتم العثور على حواسيب محمولة تطابق ميزانيتك وتفضيلاتك بدقة." : "No laptops found matching your exact budget and preferences.";
+  emptyContainer.appendChild(msg);
+  const resetBtn = rootDoc.createElement("button");
+  resetBtn.type = "button";
+  resetBtn.className = "ibj-reset-button";
+  resetBtn.setAttribute("data-ibj-action", "reset");
+  resetBtn.setAttribute("aria-label", isAr ? "مسح التفضيلات وعرض الكل" : "Reset preferences to view all");
+  resetBtn.textContent = isAr ? "مسح التفضيلات وعرض الكل" : "Reset preferences to view all";
+  if (callbacks?.onResetPreferences) {
+    resetBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      callbacks.onResetPreferences();
+    });
+  }
+  emptyContainer.appendChild(resetBtn);
+  return emptyContainer;
+}
+function localizeReasonCode(code, locale) {
+  const isAr = locale === "ar";
+  switch (code) {
+    case "matches_budget":
+      return isAr ? "ضمن ميزانيتك" : "Within budget";
+    case "matches_declared_portability":
+      return isAr ? "خفيف ومناسب للتنقل" : "Lightweight & portable";
+    case "matches_declared_performance":
+      return isAr ? "أداء فائق" : "High performance";
+    case "data_available":
+      return isAr ? "بيانات معتمدة" : "Verified specs";
+    case "insufficient_evidence":
+      return isAr ? "لا توجد نتائج مطابقة" : "No matches";
+    default:
+      return code;
   }
 }
 // sdk/src/client.ts
 class IBJClient {
   options;
+  activeController = null;
   constructor(options) {
     if (!options.tenantKey) {
       throw new Error("tenantKey is required");
@@ -8026,7 +8286,11 @@ class IBJClient {
     };
   }
   async compose(params) {
+    if (this.activeController) {
+      this.activeController.abort();
+    }
     const controller = new AbortController;
+    this.activeController = controller;
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, this.options.timeoutMs);
@@ -8084,14 +8348,45 @@ class IBJClient {
       return null;
     } finally {
       clearTimeout(timeoutId);
+      if (this.activeController === controller) {
+        this.activeController = null;
+      }
     }
   }
-  async apply(params, rootDoc) {
+  async apply(params, rootDoc = document) {
     const plan = await this.compose(params);
     if (!plan) {
       return null;
     }
-    renderExperiencePlan(plan, rootDoc);
+    renderExperiencePlan(plan, rootDoc, {
+      onSelectIntent: (intentId) => {
+        this.apply({
+          ...params,
+          requestId: "req_" + Math.random().toString(36).substring(2, 10),
+          preferences: {
+            ...params.preferences,
+            purpose: intentId
+          }
+        }, rootDoc);
+      },
+      onSelectBudget: (budgetMinor) => {
+        this.apply({
+          ...params,
+          requestId: "req_" + Math.random().toString(36).substring(2, 10),
+          preferences: {
+            ...params.preferences,
+            maxBudgetMinor: budgetMinor
+          }
+        }, rootDoc);
+      },
+      onResetPreferences: () => {
+        this.apply({
+          ...params,
+          requestId: "req_" + Math.random().toString(36).substring(2, 10),
+          preferences: {}
+        }, rootDoc);
+      }
+    });
     return plan;
   }
 }

@@ -50,14 +50,15 @@ func TestCompose_WithPostgresCatalog(t *testing.T) {
 	}
 
 	tenantID := fmt.Sprintf("tenant_comp_%d", time.Now().UnixNano())
-	secret := "secret_comp_123"
+	keyRef := "ref_comp_123"
+	secret := "test_secret_123"
 
 	// Seed tenant
 	_, err = db.Pool().Exec(context.Background(), `
-		INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
+		INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
 		VALUES ($1, 'Compose Tenant', $2, 86400)
 		ON CONFLICT (tenant_id) DO NOTHING
-	`, tenantID, secret)
+	`, tenantID, keyRef)
 	if err != nil {
 		t.Fatalf("failed to seed tenant: %v", err)
 	}
