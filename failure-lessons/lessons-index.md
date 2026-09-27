@@ -44,3 +44,15 @@ archive_reason: null
 | **FL-005** | Hybrid CJS/ESM Default Export Resolution Failure | TypeScript NodeNext builds targeting multiple runtimes must defensively unwrap default exports (`pkg.default || pkg`). | Storefront SDK / Toolchain | Resolved | [`typescript-runtime-interop.md`](typescript-runtime-interop.md) |
 | **FL-006** | Workspace CLI Flag Ordering Incompatibility | Multi-package workspace scripts must use POSIX subshell execution (`cd <dir> && <cmd>`) rather than trailing directory flags. | Build / Workspace | Resolved | [`typescript-runtime-interop.md`](typescript-runtime-interop.md) |
 | **FL-007** | Storefront Degradation Vulnerability Under Engine Failure | Client SDKs must never mutate, reflow, or blank merchant DOM when engine times out, fails with 5xx, or returns invalid schema. | Storefront SDK / Engine | Resolved | [`fail-open-resilience.md`](fail-open-resilience.md) |
+
+---
+
+## 3. Slice 3 Phase 0 Lessons (T02 Debt Resolution & Hardening)
+
+| Lesson | Failure Class | Prevention Rule | System | Status | Document |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FL-008** | Out-of-Stock Variants Surfacing in Catalog Search | All candidate product and variant queries must strictly enforce `inventory_status = 'in_stock'` to preserve commerce safety (FR-005). | `internal/catalog` | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
+| **FL-009** | Misleading TotalCount Field Reporting Page Size | Distinguish slice/page length (`ReturnedCount`) from total matching catalog population (`TotalMatchingCount`) in API contracts. | `internal/catalog` | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
+| **FL-010** | Silent Defaulting of Tenant Max Staleness & Non-Injected Clock | Reject silent defaults on multi-tenant freshness invariants; inject explicit temporal Clocks into queries instead of relying on database `NOW()`. | `internal/catalog`, `internal/storage/postgres` | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
+| **FL-011** | Plaintext HMAC Secrets Stored in Tenant Tables | Store only opaque key references in relational database tables; delegate secret resolution to a dedicated `SecretProvider`. | `internal/secret`, `cmd/ibj-feed` | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
+| **FL-012** | Toolchain Version and Unused Dependency Drift | Continuously verify that documentation, CI container definitions, and architecture decision records remain strictly aligned. | CI, `AGENTS.md`, ADR-0005 | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
