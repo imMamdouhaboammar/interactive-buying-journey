@@ -41,8 +41,8 @@ func setupPostgresCatalogTest(t *testing.T) (*postgres.DB, *catalog.PostgresCata
 	tenantID := fmt.Sprintf("tenant_cat_%d", time.Now().UnixNano())
 	// Tenant with 3600 seconds (1 hour) max staleness
 	_, err = db.Pool().Exec(context.Background(), `
-		INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
-		VALUES ($1, 'Catalog Tenant', 'secret_cat', 3600)
+		INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+		VALUES ($1, 'Catalog Tenant', 'ref_cat', 3600)
 		ON CONFLICT (tenant_id) DO NOTHING
 	`, tenantID)
 	if err != nil {
@@ -359,8 +359,8 @@ func TestPostgresCatalog_Debts_StalenessAndClock(t *testing.T) {
 		tenantID := fmt.Sprintf("tenant_nostale_%d", time.Now().UnixNano())
 		// Tenant with NULL max_staleness_seconds
 		_, err := db.Pool().Exec(ctx, `
-			INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
-			VALUES ($1, 'No Staleness Tenant', 'secret', NULL)
+			INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+			VALUES ($1, 'No Staleness Tenant', 'ref_nostale', NULL)
 		`, tenantID)
 		if err != nil {
 			t.Fatalf("failed creating tenant with NULL staleness: %v", err)
@@ -403,8 +403,8 @@ func TestPostgresCatalog_Debts_StalenessAndClock(t *testing.T) {
 		tenantID := fmt.Sprintf("tenant_clock_%d", time.Now().UnixNano())
 		// Tenant with 3600 seconds staleness
 		_, err := db.Pool().Exec(ctx, `
-			INSERT INTO tenants (tenant_id, name, secret_current, max_staleness_seconds)
-			VALUES ($1, 'Clock Tenant', 'secret', 3600)
+			INSERT INTO tenants (tenant_id, name, secret_key_ref, max_staleness_seconds)
+			VALUES ($1, 'Clock Tenant', 'ref_clock', 3600)
 		`, tenantID)
 		if err != nil {
 			t.Fatalf("failed creating tenant: %v", err)

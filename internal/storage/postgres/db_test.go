@@ -70,8 +70,8 @@ func TestPostgres_MigrationsAndRLS(t *testing.T) {
 
 	// Seed tenant records
 	_, err := db.Pool().Exec(ctx, `
-		INSERT INTO tenants (tenant_id, name, secret_current)
-		VALUES ($1, 'Tenant A', 'secret_a'), ($2, 'Tenant B', 'secret_b')
+		INSERT INTO tenants (tenant_id, name, secret_key_ref)
+		VALUES ($1, 'Tenant A', 'ref_a'), ($2, 'Tenant B', 'ref_b')
 		ON CONFLICT (tenant_id) DO NOTHING
 	`, tenantA, tenantB)
 	if err != nil {
