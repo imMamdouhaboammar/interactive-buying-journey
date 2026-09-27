@@ -305,13 +305,13 @@ func TestService_IngestDecisionTable(t *testing.T) {
 
 	t.Run("TC-ORD-07 to 10: Delete, tombstone, stale older upsert, and resurrection", func(t *testing.T) {
 		vID := "var_tombstone_cycle"
-		// 1. Create variant at 10:00
-		b1 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_1","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p","variant_id":"%s","sku":"S","title":"Live Variant","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T10:00:00Z"}],"deletes":[]}`, tenantID, vID))
+		// 1. Create variant at 08:00
+		b1 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_1","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p","variant_id":"%s","sku":"S","title":"Live Variant","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T08:00:00Z"}],"deletes":[]}`, tenantID, vID))
 		_, _ = svc.ReceiveBatch(ctx, tenantID, "m", "v1", b1)
 		_, _ = svc.ProcessBatch(ctx, tenantID, "b_tomb_1")
 
-		// 2. Delete at 11:00 (TC-ORD-07)
-		b2 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_2","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p2","variant_id":"v2","sku":"S2","title":"Other","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T11:00:00Z"}],"deletes":["%s"]}`, tenantID, vID))
+		// 2. Delete at 09:00 (TC-ORD-07)
+		b2 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_2","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p2","variant_id":"v2","sku":"S2","title":"Other","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T09:00:00Z"}],"deletes":["%s"]}`, tenantID, vID))
 		_, _ = svc.ReceiveBatch(ctx, tenantID, "m", "v1", b2)
 		s2, err := svc.ProcessBatch(ctx, tenantID, "b_tomb_2")
 		if err != nil {
@@ -329,8 +329,8 @@ func TestService_IngestDecisionTable(t *testing.T) {
 			t.Errorf("expected variant to be tombstoned")
 		}
 
-		// 3. Late older upsert at 10:30 (TC-ORD-08) -> stays deleted
-		b3 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_3","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p","variant_id":"%s","sku":"S","title":"Late Older Live","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T10:30:00Z"}],"deletes":[]}`, tenantID, vID))
+		// 3. Late older upsert at 08:30 (TC-ORD-08) -> stays deleted
+		b3 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_3","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p","variant_id":"%s","sku":"S","title":"Late Older Live","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T08:30:00Z"}],"deletes":[]}`, tenantID, vID))
 		_, _ = svc.ReceiveBatch(ctx, tenantID, "m", "v1", b3)
 		s3, _ := svc.ProcessBatch(ctx, tenantID, "b_tomb_3")
 		if s3.StatsStale != 1 {
@@ -344,8 +344,8 @@ func TestService_IngestDecisionTable(t *testing.T) {
 			t.Errorf("expected variant to remain tombstoned")
 		}
 
-		// 4. Newer upsert at 12:00 (TC-ORD-09) -> resurrected
-		b4 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_4","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p","variant_id":"%s","sku":"S","title":"Resurrected Variant","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T12:00:00Z"}],"deletes":[]}`, tenantID, vID))
+		// 4. Newer upsert at 10:00 (TC-ORD-09) -> resurrected
+		b4 := []byte(fmt.Sprintf(`{"batch_id":"b_tomb_4","tenant_id":"%s","source":"m","source_version":"v1","upserts":[{"product_id":"p","variant_id":"%s","sku":"S","title":"Resurrected Variant","published":true,"currency":"USD","price_minor":100,"inventory_status":"in_stock","source_updated_at":"2026-09-27T10:00:00Z"}],"deletes":[]}`, tenantID, vID))
 		_, _ = svc.ReceiveBatch(ctx, tenantID, "m", "v1", b4)
 		s4, _ := svc.ProcessBatch(ctx, tenantID, "b_tomb_4")
 		if s4.StatsUpserted != 1 {

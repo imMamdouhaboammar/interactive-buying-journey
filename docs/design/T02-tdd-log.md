@@ -175,3 +175,31 @@
   ```
 - **Causal Failure Verified:** Stub methods return `errors.New("not implemented")`.
 
+### 4.2 GREEN Phase
+- **Implementation:** `internal/ingest/service.go`
+  - Added `ReceiveBatch`: computes payload SHA-256 hash, verifies idempotency against existing `feed_batches`, returns 202 `is_duplicate: true` on identical payload, rejects hash mismatches with `ErrBatchHashMismatch`.
+  - Added `ProcessBatch`: implements state transitions (`RECEIVED -> AUTHENTICATED -> VALIDATED -> APPLIED -> INDEXED -> ACTIVE` and `QUARANTINED`).
+  - Implemented 14-row Ingest Decision Table rules:
+    - Quarantines invalid batches, persisting error report while keeping projection intact.
+    - Timestamp tie-breaking with stale skip tracking (`StatsStale`).
+    - Identical content no-op with timestamp refresh.
+    - Conflicting content retention with conflict counter (`StatsConflicts`).
+    - Tombstone deletion with batch source timestamp.
+    - Resurrection of tombstoned variants on newer upsert.
+    - Unknown variant deletion stubbing.
+    - Dynamic version registration with `SUPERSEDED` deprecation.
+- **Execution Output:**
+  ```text
+  --- PASS: TestService_IngestDecisionTable (0.09s)
+  PASS
+  ok  	github.com/imMamdouhaboammar/interactive-buying-journey/internal/ingest	0.663s
+  ```
+
+### 4.3 RAPID Property Testing
+- **Target:** `internal/ingest/property_test.go`
+- Property `TestProperty_BatchPermutationConvergence`: Generates pairs of batches with conflicting updates across random tenants, applying them in forward and reverse orders. Proves mathematically that any arrival permutation converges to the identical projection state.
+- **Execution Output:**
+  ```text
+  [rapid] OK, passed 100 tests (716.842584ms)
+  PASS
+  ```
