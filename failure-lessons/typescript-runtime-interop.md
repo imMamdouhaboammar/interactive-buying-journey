@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0028
+title: TypeScript Runtime Interoperability & Workspace Tooling
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # TypeScript Runtime Interoperability & Workspace Tooling
 
 This document captures lessons learned regarding TypeScript compilation, CommonJS/ESM interop across different JS runtimes (Bun, Node, Vite), and workspace CLI flag portability.

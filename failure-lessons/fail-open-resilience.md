@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0022
+title: Fail-Open Presentation & Fail-Closed Commerce
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # Fail-Open Presentation & Fail-Closed Commerce
 
 This document captures lessons learned and invariants codified around the core architectural guarantee of the Interactive Buying Journey (IBJ): **Fail-Open Presentation, Fail-Closed Commerce**.

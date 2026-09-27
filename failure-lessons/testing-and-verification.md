@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0027
+title: Testing & Verification Patterns and Failure Mappings
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # Testing & Verification Patterns and Failure Mappings
 
 > **Scope:** Verification engineering across Slice 1 (Baseline) and Slice 2 (Catalog Ingest).

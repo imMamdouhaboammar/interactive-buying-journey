@@ -1,3 +1,17 @@
+---
+doc_id: IBJ-CODE-0014
+title: "ADR-0005: T02 Persistence, Ingest Dependencies, and PostgreSQL Standards"
+lifecycle: durable
+status: active
+visibility: public
+owner: Mamdouh Aboammar
+last_reviewed: 2026-09-27
+review_by: 2027-03-27
+expires_when: null
+superseded_by: null
+archived_on: null
+archive_reason: null
+---
 # ADR-0005: T02 Persistence, Ingest Dependencies, and PostgreSQL Standards
 
 - **Status:** PROPOSED (T02 Implementation Gate)
