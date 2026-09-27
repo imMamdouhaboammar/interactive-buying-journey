@@ -56,3 +56,15 @@ archive_reason: null
 | **FL-010** | Silent Defaulting of Tenant Max Staleness & Non-Injected Clock | Reject silent defaults on multi-tenant freshness invariants; inject explicit temporal Clocks into queries instead of relying on database `NOW()`. | `internal/catalog`, `internal/storage/postgres` | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
 | **FL-011** | Plaintext HMAC Secrets Stored in Tenant Tables | Store only opaque key references in relational database tables; delegate secret resolution to a dedicated `SecretProvider`. | `internal/secret`, `cmd/ibj-feed` | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
 | **FL-012** | Toolchain Version and Unused Dependency Drift | Continuously verify that documentation, CI container definitions, and architecture decision records remain strictly aligned. | CI, `AGENTS.md`, ADR-0005 | Resolved | [`t02-debt-resolutions.md`](t02-debt-resolutions.md) |
+
+---
+
+## 4. Slice 3 Lessons (Interactive UI Tracer, Accessibility & Invariants)
+
+| Lesson | Failure Class | Prevention Rule | System | Status | Document |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **FL-013** | Semantic Heading Order Violation in Embedded Layouts | Enforce strict `h1 -> h2 -> h3` heading hierarchy in dynamic UI injection to prevent Axe accessibility failures. | SDK Renderer, Storefront | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+| **FL-014** | Event Bubbling Collisions Between Injected UI and Host Storefront | Interactive elements inside dynamic injected containers must call `stopPropagation()` to contain events. | SDK Renderer, Storefront | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+| **FL-015** | Baseline Slot Mutation vs Clean Restoration | Cache pristine innerHTML on first adaptation; restore exact baseline HTML on reset; leave untouched slots unmutated. | SDK Renderer | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+| **FL-016** | Network Race Conditions on Rapid User Input | Use `AbortController` in client SDK to automatically cancel in-flight requests when sequential user input occurs. | Storefront SDK (`IBJClient`) | Resolved | [`t03-interactive-tracer-learnings.md`](t03-interactive-tracer-learnings.md) |
+
